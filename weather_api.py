@@ -46,7 +46,7 @@ CORS(app)
 
 class Weather:
     """Initialise a Weather object with location, temperature, UV, and sun data."""
-    def __init__(self,place_name:str, country:str, lat:float, long:float, date:Date,max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict): 
+    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict): 
         self.place_name = place_name # ✔ 
         self.country = country # ✔
         self.lat = lat # ✔
@@ -133,6 +133,7 @@ def get_weather(lat: float, long: float) -> Weather:
     
     #create and return a Weather object
     today = datetime.now().strftime('%Y-%m-%d')
+    test_bool = False
     
     weather = Weather(
         place_name= data.get('name','Unknown'),
@@ -163,7 +164,7 @@ def utc_to_local(utc_str: str, lat:float, long:float) ->str:
     """Convert a UTC timestamp string to local time string using coordinates to determine timezone."""
     dt = datetime.fromisoformat(utc_str.replace("Z","+00:00"))
     tf = TimezoneFinder()
-    tz_name = tf.timezone_at(lat=lat,lng=long)
+    tz_name = str(tf.timezone_at(lat=lat,lng=long))
     local_dt = dt.astimezone(ZoneInfo(tz_name))
     return local_dt.strftime("%H:%M")
 
