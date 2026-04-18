@@ -23,7 +23,7 @@ from timezonefinder import TimezoneFinder
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv() #this contains the API codes
 
 # Get the keys
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
