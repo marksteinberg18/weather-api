@@ -209,11 +209,11 @@ def weather_endpoint():
         return jsonify({"error": str(e)}), 500
     
 if __name__ == '__main__':
-    print('Starting Weather API on http://localhost:5000')
-    print('Test it: http://localhost:5000/weather?lat=10.1632&long=76.6413')
-    app.run(debug=True, port=5000)
-    
-
-
-
+    print('Starting Weather API')
+    #print('Test it: http://localhost:5000/weather?lat=10.1632&long=76.6413')
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    print(f' Weather API using port {port}')
+    app.run(host='0.0.0.0', port=port, debug=False)
+ 
 
