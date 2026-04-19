@@ -195,6 +195,10 @@ def weather_endpoint():
         except ValueError:
             return jsonify({"error" : "lat and long must be numbers"}), 400
         
+        print(f'Incoming Latitude: {lat}')
+        print(f'Incoming Longitude: {long}')
+        
+        
         #Validate range
         if not (-90 <= lat <= 90) or not (-180 <= long <= 180):
             return jsonify({"error": "Invalid coordinates"}),400
