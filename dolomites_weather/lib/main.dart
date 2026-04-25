@@ -13,10 +13,7 @@ class UVWeatherApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Weather & UV',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const MainWeatherScreen(),
     );
   }
@@ -30,7 +27,7 @@ class MainWeatherScreen extends StatefulWidget {
 
 class _WeatherScreenState extends State<MainWeatherScreen> {
   String _status = 'Press button to get weather and UV burn times';
-  Map<String,dynamic> ? _weatherData;
+  Map<String, dynamic>? _weatherData;
   bool _loading = false;
 
   final String apiUrl = 'https://weather-api-8bte.onrender.com/weather';
@@ -43,7 +40,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
       //Step 1: do we have location permission?
       LocationPermission permission = await Geolocator.checkPermission();
       //If permission denies, ask the user:
-      if (permission==LocationPermission.denied) {
+      if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         //if they still deny, stop here:
         if (permission == LocationPermission.denied) {
@@ -62,7 +59,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
       setState(() => _status = 'Fetching weather and UV data...');
 
       //Build the URL
-      final url = Uri.parse('$apiUrl?lat=${position.latitude}&long=${position.longitude}');
+      final url = Uri.parse(
+        '$apiUrl?lat=${position.latitude}&long=${position.longitude}',
+      );
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -86,6 +85,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
     }
   }
 
+  //basic UI will develop this...
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,8 +98,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
             Text(_status),
             const SizedBox(height: 16),
             if (_loading) const CircularProgressIndicator(),
-            if (_weatherData != null)
-              Text(_weatherData.toString()),
+            if (_weatherData != null) Text(_weatherData.toString()),
           ],
         ),
       ),
@@ -110,6 +109,3 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
     );
   }
 }
-
-
-
