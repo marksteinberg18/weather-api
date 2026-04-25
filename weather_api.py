@@ -219,5 +219,11 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print(f' Weather API using port {port}')
     app.run(host='0.0.0.0', port=port, debug=False)
+    
+    #London: 51.5072° N, 0.1276° W
+    #https://weather-api-8bte.onrender.com/weather?lat=51.5072&long=0.1276
+    
+    #Cobble Hill, New York 40.6913° N latitude and 73.9972° W longitude
+    #https://weather-api-8bte.onrender.com/weather?lat=40.6913&long=73.9972
  
 
