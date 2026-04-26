@@ -14,6 +14,7 @@ class UVWeatherApp extends StatelessWidget {
     return MaterialApp(
       title: 'Weather & UV',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      debugShowCheckedModeBanner: false,
       home: const MainWeatherScreen(),
     );
   }
@@ -89,23 +90,71 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Weather & UV')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(_status),
-            const SizedBox(height: 16),
-            if (_loading) const CircularProgressIndicator(),
-            if (_weatherData != null) Text(_weatherData.toString()),
-          ],
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2EA8E8),
+        centerTitle: true,
+        leading: const Icon(Icons.settings, color: Colors.white),
+        title: const Text(
+          'Here!',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _loading ? null : _getWeather,
-        child: const Icon(Icons.cloud_download),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Image.asset(
+                  'assets/images/vibrantmountain.png',
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  top: 10,
+                  left: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Good morning.', //will change depending before/after noon
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Stay safe in the sun!',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+//   body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Center(
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Text(_status),
+//               const SizedBox(height: 16),
+//               if (_loading) const CircularProgressIndicator(),
+//               if (_weatherData != null) Text(_weatherData.toString()),
+//             ],
+//           ),
+//         ),
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         onPressed: _loading ? null : _getWeather,
+//         child: const Icon(Icons.cloud_download),
+//       ),
