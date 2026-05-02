@@ -107,7 +107,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                 Image.asset(
                   'assets/images/vibrantmountain.png',
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height,
+                  height: MediaQuery.of(context).size.height * 0.95,
                   fit: BoxFit.cover,
                 ),
                 Positioned(

@@ -46,7 +46,7 @@ CORS(app)
 
 class Weather:
     """Initialise a Weather object with location, temperature, UV, and sun data."""
-    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict): 
+    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict, elevation:float): 
         self.place_name = place_name # ✔ 
         self.country = country # ✔
         self.lat = lat # ✔
@@ -60,6 +60,7 @@ class Weather:
         self.weather_description = weather_description
         self.weather_icon = weather_icon
         self.burn_times = burn_times
+        self.elevation = elevation
         
    
         #Remember: weather icon at: http://openweathermap.org/img/w/{weather icon string e.g. 10d}.png
@@ -90,7 +91,7 @@ def get_weather(lat: float, long: float) -> Weather:
     url = f'https://api.open-meteo.com/v1/elevation?latitude={lat}&longitude={long}'
     response = requests.get(url)
     data = response.json()
-    altitude = data.get('elevation')[0]
+    altitude = float(data.get('elevation')[0])
     
     #job 2. obtain UV data  
     openuv_url = 'https://api.openuv.io/api/v1/uv?'
@@ -148,7 +149,8 @@ def get_weather(lat: float, long: float) -> Weather:
         sunset_local=sunset_local,
         weather_description=weather_description,
         weather_icon=weather_icon,
-        burn_times=calculate_burntimes(uv_max))
+        burn_times=calculate_burntimes(uv_max),
+        elevation=altitude)
     return weather  
     
 def calculate_burntimes (uv_max: float) -> dict:
@@ -170,6 +172,28 @@ def utc_to_local(utc_str: str, lat:float, long:float) ->str:
 
           
 # API Endpoints - no main() needed now
+
+@app.route('/test')
+def test():
+    """Mock data return to save external API calls"""
+    mock_data = {
+        "place_name" : "Cobble Hill",
+        "country" : "Sam's new home",
+        "lat" : 123,
+        "long" : 456,
+        "date" : "2026-05-02",
+        "max_temp" : 21.2,
+        "max_uv" : 4.32,
+        "maxuv_time_local" : "13:46",
+        "sunrise_local" : "06:45",
+        "sunset_local" : "21:05",
+        "weather_description" : "sunny",
+        "weather_icon" : "10d",
+        "burn_times" : calculate_burntimes(4.32),
+        "elevation" : 312.3}
+    print (mock_data)
+    return jsonify(mock_data)
+
 
 @app.route('/health') #remember this is not weather/health, just /health
 def health():
