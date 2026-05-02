@@ -33,7 +33,7 @@ dependencies:
   geolocator: ^13.0.2 #For GPS location
   http: ^1.2.0 #for API calls
   permission_handler: ^11.3.0 #for location permissions
-
+  google_fonts: ^6.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8

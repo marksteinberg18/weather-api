@@ -178,9 +178,9 @@ def test():
     """Mock data return to save external API calls"""
     mock_data = {
         "place_name" : "Cobble Hill",
-        "country" : "Sam's new home",
-        "lat" : 123,
-        "long" : 456,
+        "country" : "NY",
+        "lat" : 123.4,
+        "long" : 5678.9,
         "date" : "2026-05-02",
         "max_temp" : 21.2,
         "max_uv" : 4.32,
