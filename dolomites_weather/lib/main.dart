@@ -1,13 +1,18 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
 import 'weatherdata.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 void main() {
   runApp(const UVWeatherApp());
 }
+
+const _white = Colors.white;
 
 class UVWeatherApp extends StatelessWidget {
   const UVWeatherApp({super.key});
@@ -18,6 +23,7 @@ class UVWeatherApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
+        //textTheme: GoogleFonts.elMessiriTextTheme(),
         textTheme: GoogleFonts.interTextTheme(),
       ),
       debugShowCheckedModeBanner: false,
@@ -33,10 +39,10 @@ class MainWeatherScreen extends StatefulWidget {
 }
 
 class _WeatherScreenState extends State<MainWeatherScreen> {
-  String _status = 'Press button to get weather and UV burn times';
-  //String _placeName = 'Loading'
-  //String _country = 'Loading'
-  String _location = 'Loading';
+  final hour = DateTime.now().hour;
+  String get _greeting => hour < 12 ? 'Good morning!' : 'Good afternoon!';
+  String _status = 'Press button to update.';
+  String _location = '-';
 
   WeatherData? _weatherData;
   //Map<String, dynamic>? _weatherData;
@@ -47,7 +53,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
   Future<void> _getWeather() async {
     setState(() {
       _loading = true;
-      _status = 'Getting location....';
+      _status = 'Getting location';
     });
     try {
       //Step 1: do we have location permission?
@@ -65,11 +71,11 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
         }
       }
       //Step 2: get the phone's current GPS coordinates
-      setState(() => _status = 'Getting GPS coordinates...');
+      setState(() => _status = 'Getting GPS coordinates');
       Position position = await Geolocator.getCurrentPosition();
 
       //Step 3: call the weather API on Render with the co-ordinates..
-      setState(() => _status = 'Fetching weather and UV data...');
+      setState(() => _status = 'Fetching weather data');
 
       //Build the URL
       final url = Uri.parse(
@@ -86,7 +92,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
         setState(() {
           _weatherData = WeatherData.fromJson(data);
           _location = '${_weatherData!.placeName}, ${_weatherData!.country}';
-          _status = 'Data received!';
+          _status = 'Stay safe in the sun.';
           _loading = false;
         });
       } else {
@@ -106,16 +112,8 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
   //basic UI will develop this...
   @override
   Widget build(BuildContext context) {
+    final _screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      //   appBar: AppBar(
-      //     backgroundColor: const Color(0xFF2EA8E8),
-      //     centerTitle: true,
-      //     leading: const Icon(Icons.settings, color: Colors.white),
-      //     title: const Text(
-      //       'Here!',
-      //       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      //     ),
-      //   ),
       body: Column(
         children: [
           Stack(
@@ -123,30 +121,171 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
               Image.asset(
                 'assets/images/vibrantmountain.png',
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height,
+                height: _screenHeight,
                 fit: BoxFit.cover,
               ),
               Positioned(
-                left: 10,
+                left: 7,
+                right: 0,
                 top: 40,
                 child: Column(
-                  //crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      //mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          _location,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
+                        Icon(Icons.settings, color: Colors.white, size: 22),
+                        Expanded(
+                          child: Center(
+                            child: AutoSizeText(
+                              _location,
+                              minFontSize: 12,
+                              maxFontSize: 18,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
-                        Text(
-                          'sett',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
+                        SizedBox(width: 25),
                       ],
+                    ),
+                    SizedBox(height: _screenHeight * 0.03),
+                    Text(
+                      _greeting,
+                      style: TextStyle(
+                        fontSize: 25,
+                        color: _white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      _status,
+                      style: TextStyle(fontSize: 20, color: _white),
+                    ),
+                    SizedBox(height: _screenHeight * 0.02),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Card(
+                              margin: EdgeInsets.zero,
+                              color: _white,
+                              elevation: 4,
+                              child: Padding(
+                                padding: EdgeInsets.all(7),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "MAX UV INDEX",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        AutoSizeText(
+                                          "8",
+                                          minFontSize: 30,
+                                          maxFontSize: 80,
+                                          style: GoogleFonts.bebasNeue(
+                                            fontSize: 70,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                        Text("  gauge "),
+                                      ],
+                                    ),
+                                    Text(
+                                      "VERY HIGH",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.5,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Wear sunscreen, seek shade and protect your skin.",
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Card(
+                              margin: EdgeInsets.zero,
+                              color: _white,
+                              elevation: 4,
+                              child: Padding(
+                                padding: EdgeInsets.all(7),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "TEMPERATURE",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        AutoSizeText(
+                                          "21",
+                                          minFontSize: 30,
+                                          maxFontSize: 80,
+                                          style: GoogleFonts.bebasNeue(
+                                            fontSize: 70,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                        Text("  gauge "),
+                                      ],
+                                    ),
+                                    Text(
+                                      "T-shirt weather",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        _weatherData == null
+                                            ? Icon(Icons.flutter_dash, size: 20)
+                                            : Image.network(
+                                              'https://openweathermap.org/payload/api/media/file/${_weatherData?.weatherIcon}.png',
+                                              width: 50,
+                                              height: 50,
+                                            ),
+                                        Expanded(
+                                          child: Text(
+                                            "Weather",
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -163,21 +302,14 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
   }
 }
 
-//   body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Center(
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Text(_status),
-//               const SizedBox(height: 16),
-//               if (_loading) const CircularProgressIndicator(),
-//               if (_weatherData != null) Text(_weatherData.toString()),
-//             ],
-//           ),
-//         ),
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         onPressed: _loading ? null : _getWeather,
-//         child: const Icon(Icons.cloud_download),
-//       ),
+// 0–2 °C — Freezing – big coat, gloves, regret
+// 3–5 °C — Winter insulated coat weather
+// 6–8 °C — Cold – coat firmly on
+// 9–11 °C — Chilly – light coat or layers
+// 12–14 °C — Cool – jacket weather
+// 15–17 °C — Light jacket / jumper weather
+// 18–20 °C — T-shirt with a backup layer
+// 21–23 °C — T-shirt weather
+// 24–26 °C — Shorts and T-shirt weather
+// 27–28 °C — Hot – seeking shade
+// 29–30 °C — Very hot – too warm to function properly
