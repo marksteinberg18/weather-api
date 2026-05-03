@@ -126,12 +126,11 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
               Positioned(
                 left: 7,
                 right: 0,
-                top: 40,
+                top: 30,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      //mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.settings, color: Colors.white, size: 22),
                         Expanded(
@@ -148,10 +147,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 25),
                       ],
                     ),
-                    SizedBox(height: _screenHeight * 0.03),
+                    SizedBox(height: _screenHeight * 0.01),
                     Text(
                       _greeting,
                       style: TextStyle(
@@ -167,143 +165,167 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                     SizedBox(height: _screenHeight * 0.02),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Card(
-                              margin: EdgeInsets.zero,
-                              color: _white,
-                              elevation: 4,
-                              child: Padding(
-                                padding: EdgeInsets.all(7),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "MAX UV INDEX",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        AutoSizeText(
-                                          _weatherData == null
-                                              ? '-'
-                                              : _weatherData!.maxUV
-                                                  .toStringAsFixed(0),
-                                          minFontSize: 30,
-                                          maxFontSize: 80,
-                                          style: GoogleFonts.bebasNeue(
-                                            fontSize: 70,
-                                            fontWeight: FontWeight.w900,
-                                          ),
+                      child: SizedBox(
+                        height: _screenHeight * 0.30,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Card(
+                                margin: EdgeInsets.zero,
+                                color: _white,
+                                elevation: 4,
+                                child: Padding(
+                                  padding: EdgeInsets.all(7),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "MAX UV INDEX",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -0.5,
                                         ),
-                                        Text("  gauge "),
-                                      ],
-                                    ),
-                                    Text(
-                                      _weatherData == null
-                                          ? '-'
-                                          : _weatherData!.uvLabel,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1.5,
                                       ),
-                                    ),
-                                    Text(
-                                      _weatherData == null
-                                          ? '-'
-                                          : _weatherData!.uvAction,
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Card(
-                              margin: EdgeInsets.zero,
-                              color: _white,
-                              elevation: 4,
-                              child: Padding(
-                                padding: EdgeInsets.all(7),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "MAX TEMP",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        AutoSizeText.rich(
-                                          TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: "21",
-                                                style: GoogleFonts.bebasNeue(
-                                                  fontSize: 40,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w900,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: "°C",
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          minFontSize: 20,
-                                        ),
-                                        Text("  gauge "),
-                                      ],
-                                    ),
-                                    Text(
-                                      "T-shirt weather",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        _weatherData == null
-                                            ? Icon(Icons.flutter_dash, size: 20)
-                                            : Image.network(
-                                              'https://openweathermap.org/payload/api/media/file/${_weatherData?.weatherIcon}.png',
-                                              width: 50,
-                                              height: 50,
+                                      Row(
+                                        children: [
+                                          Text(
+                                            _weatherData == null
+                                                ? ''
+                                                : _weatherData!.maxUV
+                                                    .toInt()
+                                                    .toString(),
+                                            style: GoogleFonts.bebasNeue(
+                                              fontSize: 70,
+                                              fontWeight: FontWeight.w900,
                                             ),
-                                        Expanded(
-                                          child: Text(
-                                            "Weather",
-                                            textAlign: TextAlign.center,
                                           ),
+                                          Text("  gauge "),
+                                        ],
+                                      ),
+                                      Text(
+                                        _weatherData == null
+                                            ? ''
+                                            : _weatherData!.uvLabel,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -1.5,
                                         ),
-                                      ],
-                                    ),
-                                  ],
+                                      ),
+                                      Text(
+                                        _weatherData == null
+                                            ? ''
+                                            : _weatherData!.uvAction,
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Card(
+                                margin: EdgeInsets.zero,
+                                color: _white,
+                                elevation: 4,
+                                child: Padding(
+                                  padding: EdgeInsets.all(7),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "MAX TEMP",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -0.5,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          _weatherData == null
+                                              ? Text('')
+                                              : AutoSizeText.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text:
+                                                          _weatherData!.maxTemp
+                                                              .toInt()
+                                                              .toString(),
+                                                      style:
+                                                          GoogleFonts.bebasNeue(
+                                                            fontSize: 50,
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.w900,
+                                                            letterSpacing: -3,
+                                                          ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '°C',
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                minFontSize: 20,
+                                              ),
+                                          Text("  gauge "),
+                                        ],
+                                      ),
+                                      _weatherData == null
+                                          ? Text('')
+                                          : Text(
+                                            _weatherData!.informalWeather,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: -1,
+                                            ),
+                                          ),
+                                      Row(
+                                        children: [
+                                          _weatherData == null
+                                              ? Icon(
+                                                Icons.flutter_dash,
+                                                size: 20,
+                                              )
+                                              : Image.network(
+                                                'https://openweathermap.org/payload/api/media/file/${_weatherData?.weatherIcon}.png',
+                                                width: 50,
+                                                height: 40,
+                                              ),
+                                          _weatherData == null
+                                              ? Text('')
+                                              : Expanded(
+                                                child: Text(
+                                                  _weatherData!
+                                                      .weatherDescription,
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                    letterSpacing: -1,
+                                                  ),
+                                                ),
+                                              ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
