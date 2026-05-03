@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cmd /c \"dir \"\"c:\\\\Programming\\\\Python\\\\Python projects with Claude\\\\weather-api\\\\dolomites_weather\\\\android\\\\app\\\\src\\\\main\"\"\")"
+    ]
+  }
+}

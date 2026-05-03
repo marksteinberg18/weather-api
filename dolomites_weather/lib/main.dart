@@ -193,7 +193,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                           _weatherData == null
                                               ? '-'
                                               : _weatherData!.maxUV
-                                                  .toStringAsFixed(1),
+                                                  .toStringAsFixed(0),
                                           minFontSize: 30,
                                           maxFontSize: 80,
                                           style: GoogleFonts.bebasNeue(
