@@ -234,7 +234,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "TEMPERATURE",
+                                      "MAX TEMP",
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -243,14 +243,27 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                     ),
                                     Row(
                                       children: [
-                                        AutoSizeText(
-                                          "21",
-                                          minFontSize: 30,
-                                          maxFontSize: 80,
-                                          style: GoogleFonts.bebasNeue(
-                                            fontSize: 70,
-                                            fontWeight: FontWeight.w900,
+                                        AutoSizeText.rich(
+                                          TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: "21",
+                                                style: GoogleFonts.bebasNeue(
+                                                  fontSize: 40,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: "°C",
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
                                           ),
+                                          minFontSize: 20,
                                         ),
                                         Text("  gauge "),
                                       ],
@@ -301,15 +314,3 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
     );
   }
 }
-
-// 0–2 °C — Freezing – big coat, gloves, regret
-// 3–5 °C — Winter insulated coat weather
-// 6–8 °C — Cold – coat firmly on
-// 9–11 °C — Chilly – light coat or layers
-// 12–14 °C — Cool – jacket weather
-// 15–17 °C — Light jacket / jumper weather
-// 18–20 °C — T-shirt with a backup layer
-// 21–23 °C — T-shirt weather
-// 24–26 °C — Shorts and T-shirt weather
-// 27–28 °C — Hot – seeking shade
-// 29–30 °C — Very hot – too warm to function properly
