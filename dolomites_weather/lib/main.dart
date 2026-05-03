@@ -109,7 +109,6 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
     }
   }
 
-  //basic UI will develop this...
   @override
   Widget build(BuildContext context) {
     final _screenHeight = MediaQuery.of(context).size.height;
@@ -191,7 +190,10 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                     Row(
                                       children: [
                                         AutoSizeText(
-                                          "8",
+                                          _weatherData == null
+                                              ? '-'
+                                              : _weatherData!.maxUV
+                                                  .toStringAsFixed(1),
                                           minFontSize: 30,
                                           maxFontSize: 80,
                                           style: GoogleFonts.bebasNeue(
@@ -203,7 +205,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                       ],
                                     ),
                                     Text(
-                                      "VERY HIGH",
+                                      _weatherData == null
+                                          ? '-'
+                                          : _weatherData!.uvLabel,
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
@@ -211,7 +215,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                       ),
                                     ),
                                     Text(
-                                      "Wear sunscreen, seek shade and protect your skin.",
+                                      _weatherData == null
+                                          ? '-'
+                                          : _weatherData!.uvAction,
                                       style: TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.bold,

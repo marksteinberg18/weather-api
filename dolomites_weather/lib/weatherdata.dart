@@ -1,3 +1,5 @@
+import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
+
 import 'package:flutter/material.dart';
 
 class WeatherData {
@@ -7,7 +9,7 @@ class WeatherData {
   final double long;
   final String date;
   final double maxTemp;
-  final double maxUv;
+  final double maxUV;
   final String maxuvTimeLocal;
   final String sunriseLocal;
   final String sunsetLocal;
@@ -17,6 +19,9 @@ class WeatherData {
   final double elevation;
   final String informalWeather;
   final Color temperatureColor;
+  final Color uvIndexColor;
+  final String uvAction;
+  final String uvLabel;
 
   WeatherData({
     required this.placeName,
@@ -25,7 +30,7 @@ class WeatherData {
     required this.long,
     required this.date,
     required this.maxTemp,
-    required this.maxUv,
+    required this.maxUV,
     required this.maxuvTimeLocal,
     required this.sunriseLocal,
     required this.sunsetLocal,
@@ -35,17 +40,21 @@ class WeatherData {
     required this.elevation,
     required this.informalWeather,
     required this.temperatureColor,
+    required this.uvIndexColor,
+    required this.uvAction,
+    required this.uvLabel,
   });
 
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     final maxTemp = (json['max_temp'] as num).toDouble();
+    final maxUV = (json['max_uv'] as num).toDouble();
     return WeatherData(
       placeName: json['place_name'],
       country: json['country'],
       lat: (json['lat'] as num).toDouble(),
       long: (json['long'] as num).toDouble(),
       date: json['date'],
-      maxUv: json['max_uv'],
+      maxUV: maxUV,
       maxTemp: maxTemp,
       maxuvTimeLocal: json['maxuv_time_local'],
       sunriseLocal: json['sunrise_local'],
@@ -56,8 +65,41 @@ class WeatherData {
       elevation: json['elevation'],
       informalWeather: informalWeatherFinder(maxTemp),
       temperatureColor: temperatureColorFinder(maxTemp),
+      uvIndexColor: uvIndexColorFinder(maxUV),
+      uvAction: uvActionFinder(maxUV),
+      uvLabel: uvLabelFinder(maxUV),
     );
   }
+}
+
+String uvActionFinder(double uv) {
+  if (uv <= 2) return 'No protection needed. Safe to stay outside.';
+  if (uv <= 5) {
+    return 'Use sunscreen and sun hats. Seek shade during midday peak hours (11 am-3 pm)';
+  }
+  if (uv <= 7) {
+    return 'Apply SPF 50+ sunscreen, wear protective clothing, and seek shade';
+  }
+  if (uv <= 10) {
+    return 'High risk of harm. Avoid sun exposure if possible, apply high SPF, and cover up';
+  }
+  return 'Avoid being outside during midday. Maximum protection is essential';
+}
+
+String uvLabelFinder(double uv) {
+  if (uv <= 2) return 'LOW';
+  if (uv <= 5) return 'MODERATE';
+  if (uv <= 7) return 'HIGH';
+  if (uv <= 10) return 'VERY HIGH';
+  return 'EXTREME';
+}
+
+Color uvIndexColorFinder(double uv) {
+  if (uv <= 2) return Color(0xFF4CAF50);
+  if (uv <= 5) return Color(0xFFFFEE58);
+  if (uv <= 7) return Color(0xFFFF9800);
+  if (uv <= 10) return Color(0xFFF44336);
+  return Color(0xFF9C27B0);
 }
 
 Color temperatureColorFinder(double temp) {
