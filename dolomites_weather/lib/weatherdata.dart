@@ -115,17 +115,17 @@ Color temperatureColorFinder(double temp) {
 }
 
 String informalWeatherFinder(double temp) {
-  if (temp <= 2) return 'Freezing! Coat, gloves, hat';
-  if (temp <= 5) return 'Thick winter coat zipped up';
-  if (temp <= 8) return 'Cold - coat firmly on';
-  if (temp <= 11) return 'Chilly - light coat or layers';
-  if (temp <= 14) return 'Cool - jacket weather';
-  if (temp <= 17) return 'Light jacket/jumper weather';
-  if (temp <= 20) return 'T-shirt with backup layer';
-  if (temp <= 23) return 'T-shirt weather';
-  if (temp <= 26) return 'Shorts and T-shirts';
-  if (temp <= 28) return 'Hot - seeking shade';
-  return 'Very hot - too warm to function';
+  if (temp <= 2) return 'Freezing! Coat, gloves, hat.';
+  if (temp <= 5) return 'Thick winter coat zipped up.';
+  if (temp <= 8) return 'Cold - coat firmly on.';
+  if (temp <= 11) return 'Chilly - light coat or layers.';
+  if (temp <= 14) return 'Cool - jacket weather.';
+  if (temp <= 17) return 'Light jacket/jumper weather.';
+  if (temp <= 20) return 'T-shirt with backup layer.';
+  if (temp <= 23) return 'T-shirt weather.';
+  if (temp <= 26) return 'Shorts and T-shirts.';
+  if (temp <= 28) return 'Hot - seeking shade.';
+  return 'Very hot - too warm to function.';
 }
 
 ///String informalWeather(double temp) {

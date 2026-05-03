@@ -49,7 +49,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
   bool _loading = false;
 
   //change 'test' to 'weather' when going for live data
-  final String apiUrl = 'https://weather-api-8bte.onrender.com/test';
+  final String apiUrl = 'https://weather-api-8bte.onrender.com/weather';
   Future<void> _getWeather() async {
     setState(() {
       _loading = true;
@@ -82,10 +82,10 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
         '$apiUrl?lat=${position.latitude}&long=${position.longitude}',
       ); //not used for testing
 
-      //final response = await http.get(url);
-      final response = await http.get(
-        Uri.parse(apiUrl),
-      ); //test data without lat/long data
+      final response = await http.get(url);
+      //final response = await http.get(
+      //Uri.parse(apiUrl),
+      //); //test data without lat/long data
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -199,6 +199,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                             style: GoogleFonts.bebasNeue(
                                               fontSize: 70,
                                               fontWeight: FontWeight.w900,
+                                              color:
+                                                  _weatherData?.uvIndexColor ??
+                                                  Colors.black,
                                             ),
                                           ),
                                           Text("  gauge "),
@@ -212,6 +215,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                           fontSize: 14,
                                           fontWeight: FontWeight.w900,
                                           letterSpacing: -1.5,
+                                          color:
+                                              _weatherData?.uvIndexColor ??
+                                              Colors.black,
                                         ),
                                       ),
                                       Text(
@@ -260,20 +266,25 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                                           _weatherData!.maxTemp
                                                               .toInt()
                                                               .toString(),
-                                                      style:
-                                                          GoogleFonts.bebasNeue(
-                                                            fontSize: 50,
-                                                            color: Colors.black,
-                                                            fontWeight:
-                                                                FontWeight.w900,
-                                                            letterSpacing: -3,
-                                                          ),
+                                                      style: GoogleFonts.bebasNeue(
+                                                        fontSize: 50,
+                                                        color:
+                                                            _weatherData
+                                                                ?.temperatureColor ??
+                                                            Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        letterSpacing: -1,
+                                                      ),
                                                     ),
                                                     TextSpan(
                                                       text: '°C',
                                                       style: TextStyle(
                                                         fontSize: 10,
-                                                        color: Colors.black,
+                                                        color:
+                                                            _weatherData
+                                                                ?.temperatureColor ??
+                                                            Colors.black,
                                                       ),
                                                     ),
                                                   ],
@@ -288,9 +299,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                           : Text(
                                             _weatherData!.informalWeather,
                                             style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 9,
                                               fontWeight: FontWeight.w900,
-                                              letterSpacing: -1,
+                                              //letterSpacing: -1,
                                             ),
                                           ),
                                       Row(

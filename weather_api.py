@@ -80,7 +80,8 @@ class Weather:
             "sunset_local" : self.sunset_local,
             "weather_description" : self.weather_description,
             "weather_icon" : self.weather_icon,
-            "burn_times" : self.burn_times
+            "burn_times" : self.burn_times,
+            "elevation" : self.elevation,
         }
 
         
