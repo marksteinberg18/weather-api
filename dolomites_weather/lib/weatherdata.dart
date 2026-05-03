@@ -46,6 +46,7 @@ class WeatherData {
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     final maxTemp = (json['max_temp'] as num).toDouble();
     final maxUV = (json['max_uv'] as num).toDouble();
+    final String weatherDescriptor = (json['weather_description']);
     return WeatherData(
       placeName: json['place_name'],
       country: json['country'],
@@ -57,7 +58,7 @@ class WeatherData {
       maxuvTimeLocal: json['maxuv_time_local'],
       sunriseLocal: json['sunrise_local'],
       sunsetLocal: json['sunset_local'],
-      weatherDescription: json['weather_description'],
+      weatherDescription: weatherDescriptionFormatter(weatherDescriptor),
       weatherIcon: json['weather_icon'],
       burnTimes: Map<String, int>.from(json['burn_times']),
       elevation: json['elevation'],
@@ -70,18 +71,36 @@ class WeatherData {
   }
 }
 
+String weatherDescriptionFormatter(String text) {
+  String capitalisedWord =
+      text[0].toUpperCase() + text.substring(1).toLowerCase();
+  return capitalisedWord;
+  List<String> words = text.split(' ');
+  List<String> capitalizedWords = [];
+  for (String word in words) {
+    if (word.isEmpty) {
+      capitalizedWords.add(word);
+    } else {
+      String firstLetter = word[0].toUpperCase();
+      String restofWord = word.substring(1).toLowerCase();
+      capitalizedWords.add(firstLetter + restofWord);
+    }
+  }
+  return capitalizedWords.join(' ');
+}
+
 String uvActionFinder(double uv) {
   if (uv <= 2) return 'No protection needed. Safe to stay outside.';
   if (uv <= 5) {
-    return 'Use sunscreen and sun hats. Seek shade during midday peak hours (11 am-3 pm)';
+    return 'Use sunscreen and sun hats. Seek shade during midday peak hours (11 am-3 pm).';
   }
   if (uv <= 7) {
-    return 'Apply SPF 50+ sunscreen, wear protective clothing, and seek shade';
+    return 'Apply SPF 50+ sunscreen, wear protective clothing, and seek shade.';
   }
   if (uv <= 10) {
-    return 'High risk of harm. Avoid sun exposure if possible, apply high SPF, and cover up';
+    return 'High risk of harm. Avoid sun exposure if possible, apply high SPF, and cover up.';
   }
-  return 'Avoid being outside during midday. Maximum protection is essential';
+  return 'Avoid being outside during midday. Maximum protection is essential.';
 }
 
 String uvLabelFinder(double uv) {
