@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class WeatherData {
   final String placeName;
@@ -20,6 +21,7 @@ class WeatherData {
   final Color uvIndexColor;
   final String uvAction;
   final String uvLabel;
+  final int cloudiness;
 
   WeatherData({
     required this.placeName,
@@ -41,11 +43,14 @@ class WeatherData {
     required this.uvIndexColor,
     required this.uvAction,
     required this.uvLabel,
+    required this.cloudiness,
   });
 
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     final maxTemp = (json['max_temp'] as num).toDouble();
-    final maxUV = (json['max_uv'] as num).toDouble();
+    final int cloudiness = (json['cloudiness'] as num).toInt();
+    final maxUVignoringClouds = (json['max_uv'] as num).toDouble();
+    final maxUVwithClouds = uvCloudAdjustor(cloudiness, maxUVignoringClouds);
     final String weatherDescriptor = (json['weather_description']);
     return WeatherData(
       placeName: json['place_name'],
@@ -53,7 +58,7 @@ class WeatherData {
       lat: (json['lat'] as num).toDouble(),
       long: (json['long'] as num).toDouble(),
       date: json['date'],
-      maxUV: maxUV,
+      maxUV: maxUVwithClouds,
       maxTemp: maxTemp,
       maxuvTimeLocal: json['maxuv_time_local'],
       sunriseLocal: json['sunrise_local'],
@@ -64,11 +69,18 @@ class WeatherData {
       elevation: json['elevation'],
       informalWeather: informalWeatherFinder(maxTemp),
       temperatureColor: temperatureColorFinder(maxTemp),
-      uvIndexColor: uvIndexColorFinder(maxUV),
-      uvAction: uvActionFinder(maxUV),
-      uvLabel: uvLabelFinder(maxUV),
+      uvIndexColor: uvIndexColorFinder(maxUVwithClouds),
+      uvAction: uvActionFinder(maxUVwithClouds),
+      uvLabel: uvLabelFinder(maxUVwithClouds),
+      cloudiness: cloudiness,
     );
   }
+}
+
+double uvCloudAdjustor(int cloudCover, double maxUV) {
+  double cloudFactor = 1 - (0.75 * pow(cloudCover / 100, 3.4)).toDouble();
+  double adjustedUV = maxUV * cloudFactor;
+  return adjustedUV;
 }
 
 String weatherDescriptionFormatter(String text) {

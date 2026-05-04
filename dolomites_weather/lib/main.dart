@@ -170,7 +170,11 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                             Expanded(
                               child: Card(
                                 margin: EdgeInsets.zero,
-                                color: _white,
+                                color:
+                                    _weatherData?.uvIndexColor.withValues(
+                                      alpha: 0.15,
+                                    ) ??
+                                    _white,
                                 elevation: 4,
                                 child: Padding(
                                   padding: EdgeInsets.all(7),
@@ -192,7 +196,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                             _weatherData == null
                                                 ? ''
                                                 : _weatherData!.maxUV
-                                                    .toInt()
+                                                    .round()
                                                     .toString(),
                                             style: GoogleFonts.bebasNeue(
                                               fontSize: 70,
@@ -236,7 +240,11 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                             Expanded(
                               child: Card(
                                 margin: EdgeInsets.zero,
-                                color: _white,
+                                color:
+                                    _weatherData?.temperatureColor.withValues(
+                                      alpha: 0.15,
+                                    ) ??
+                                    _white,
                                 elevation: 4,
                                 child: Padding(
                                   padding: EdgeInsets.all(7),
