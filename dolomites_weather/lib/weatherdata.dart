@@ -75,18 +75,6 @@ String weatherDescriptionFormatter(String text) {
   String capitalisedWord =
       text[0].toUpperCase() + text.substring(1).toLowerCase();
   return capitalisedWord;
-  List<String> words = text.split(' ');
-  List<String> capitalizedWords = [];
-  for (String word in words) {
-    if (word.isEmpty) {
-      capitalizedWords.add(word);
-    } else {
-      String firstLetter = word[0].toUpperCase();
-      String restofWord = word.substring(1).toLowerCase();
-      capitalizedWords.add(firstLetter + restofWord);
-    }
-  }
-  return capitalizedWords.join(' ');
 }
 
 String uvActionFinder(double uv) {

@@ -46,7 +46,7 @@ CORS(app)
 
 class Weather:
     """Initialise a Weather object with location, temperature, UV, and sun data."""
-    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict, elevation:float): 
+    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int): 
         self.place_name = place_name # ✔ 
         self.country = country # ✔
         self.lat = lat # ✔
@@ -61,6 +61,7 @@ class Weather:
         self.weather_icon = weather_icon
         self.burn_times = burn_times
         self.elevation = elevation
+        self.cloudiness = cloudiness
         
    
         #Remember: weather icon at: http://openweathermap.org/img/w/{weather icon string e.g. 10d}.png
@@ -82,6 +83,7 @@ class Weather:
             "weather_icon" : self.weather_icon,
             "burn_times" : self.burn_times,
             "elevation" : self.elevation,
+            "cloudiness" : self.cloudiness
         }
 
         
@@ -101,7 +103,7 @@ def get_weather(lat: float, long: float) -> Weather:
         'lat':lat,
         'lng':long,
         'alt' : altitude,
-        'dt': ''
+        #'dt': '' - ISA time not used
         }
     response = requests.get(openuv_url, headers=openuv_headers, params=openuv_params)
     data = response.json()
@@ -114,6 +116,8 @@ def get_weather(lat: float, long: float) -> Weather:
     
     #job 3. obtain weather data
     url = f"https://api.openweathermap.org/data/2.5/weather"
+    #docs:
+    #https://openweathermap.org/api/current?collection=current_forecast
     params = {
         "lat" : lat,
         "lon" : long,
@@ -126,6 +130,7 @@ def get_weather(lat: float, long: float) -> Weather:
     temp_max = data['main']['temp_max']    
     weather_description  = data['weather'][0]['description']
     weather_icon = data['weather'][0]['icon']
+    cloudiness = data.get('clouds', {}).get('all',0)
      
     #job 4. convert the timestamps to local time
     uvmaxtime_local = utc_to_local(uv_max_time_utc,lat,long)
@@ -135,7 +140,6 @@ def get_weather(lat: float, long: float) -> Weather:
     
     #create and return a Weather object
     today = datetime.now().strftime('%Y-%m-%d')
-    test_bool = False
     
     weather = Weather(
         place_name= data.get('name','Unknown'),
@@ -151,7 +155,8 @@ def get_weather(lat: float, long: float) -> Weather:
         weather_description=weather_description,
         weather_icon=weather_icon,
         burn_times=calculate_burntimes(uv_max),
-        elevation=altitude)
+        elevation=altitude,
+        cloudiness=cloudiness)
     return weather  
     
 def calculate_burntimes (uv_max: float) -> dict:
