@@ -104,7 +104,7 @@ def get_weather(lat: float, long: float) -> Weather:
         "daily" : ["uv_index_max"]
     }
     responses = requests.get(url, params=params)
-    print(f'Open Meteo data: ${responses}')
+    print(f'Open Meteo data: {responses.json()}')
     
 #     url = "https://api.open-meteo.com/v1/forecast"
 # params = {
