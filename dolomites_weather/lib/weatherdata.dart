@@ -49,8 +49,7 @@ class WeatherData {
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     final maxTemp = (json['max_temp'] as num).toDouble();
     final int cloudiness = (json['cloudiness'] as num).toInt();
-    final maxUVignoringClouds = (json['max_uv'] as num).toDouble();
-    final maxUVwithClouds = uvCloudAdjustor(cloudiness, maxUVignoringClouds);
+    final double maximumUV = (json['max_uv'] as num).toDouble();
     final String weatherDescriptor = (json['weather_description']);
     return WeatherData(
       placeName: json['place_name'],
@@ -58,34 +57,32 @@ class WeatherData {
       lat: (json['lat'] as num).toDouble(),
       long: (json['long'] as num).toDouble(),
       date: json['date'],
-      maxUV: maxUVwithClouds,
+      maxUV: maximumUV,
       maxTemp: maxTemp,
       maxuvTimeLocal: json['maxuv_time_local'],
       sunriseLocal: json['sunrise_local'],
       sunsetLocal: json['sunset_local'],
-      weatherDescription: weatherDescriptionFormatter(weatherDescriptor),
+      weatherDescription: weatherDescriptionFormatter(
+        weatherDescriptor,
+        cloudiness,
+      ),
       weatherIcon: json['weather_icon'],
       burnTimes: Map<String, int>.from(json['burn_times']),
       elevation: json['elevation'],
       informalWeather: informalWeatherFinder(maxTemp),
       temperatureColor: temperatureColorFinder(maxTemp),
-      uvIndexColor: uvIndexColorFinder(maxUVwithClouds),
-      uvAction: uvActionFinder(maxUVwithClouds),
-      uvLabel: uvLabelFinder(maxUVwithClouds),
+      uvIndexColor: uvIndexColorFinder(maximumUV),
+      uvAction: uvActionFinder(maximumUV),
+      uvLabel: uvLabelFinder(maximumUV),
       cloudiness: cloudiness,
     );
   }
 }
 
-double uvCloudAdjustor(int cloudCover, double maxUV) {
-  double cloudFactor = 1 - (0.75 * pow(cloudCover / 100, 3.4)).toDouble();
-  double adjustedUV = maxUV * cloudFactor;
-  return adjustedUV;
-}
-
-String weatherDescriptionFormatter(String text) {
+String weatherDescriptionFormatter(String text, int cloudiness) {
   String capitalisedWord =
       text[0].toUpperCase() + text.substring(1).toLowerCase();
+  //capitalisedWord = '$capitalisedWord ($cloudiness%)';
   return capitalisedWord;
 }
 

@@ -216,7 +216,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w900,
-                                          letterSpacing: -1.5,
+                                          letterSpacing: 1,
                                           color:
                                               _weatherData?.uvIndexColor ??
                                               Colors.black,
@@ -302,12 +302,31 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                       ),
                                       _weatherData == null
                                           ? Text('')
-                                          : Text(
-                                            _weatherData!.informalWeather,
-                                            style: TextStyle(
-                                              fontSize: 9,
-                                              fontWeight: FontWeight.w900,
-                                              //letterSpacing: -1,
+                                          : RichText(
+                                            text: TextSpan(
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text:
+                                                      _weatherData!
+                                                          .weatherDescription,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      ' (${_weatherData!.cloudiness.toString()}%)',
+                                                  style: TextStyle(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.w600,
+                                                    letterSpacing: 0,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                       Row(
@@ -326,11 +345,11 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                               ? Text('')
                                               : Expanded(
                                                 child: Text(
-                                                  _weatherData!
-                                                      .weatherDescription,
+                                                  _weatherData!.informalWeather,
                                                   textAlign: TextAlign.left,
                                                   style: TextStyle(
-                                                    letterSpacing: -1,
+                                                    //letterSpacing: 1,
+                                                    fontSize: 9,
                                                   ),
                                                 ),
                                               ),
