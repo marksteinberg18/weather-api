@@ -104,7 +104,8 @@ def get_weather(lat: float, long: float) -> Weather:
         "daily" : ["uv_index_max"]
     }
     responses = requests.get(url, params=params)
-    print(f'Open Meteo data: {responses.json()}')
+    data = responses.json()
+    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
     
 #     url = "https://api.open-meteo.com/v1/forecast"
 # params = {
@@ -128,7 +129,7 @@ def get_weather(lat: float, long: float) -> Weather:
         }
     response = requests.get(openuv_url, headers=openuv_headers, params=openuv_params)
     data = response.json()
-    uv_max = data.get('result').get('uv_max')
+    uv_max = uv_max_new #<we're getting this from open meteo now, formerly: data.get('result').get('uv_max')
     uv_max_time_utc = data.get('result').get('uv_max_time') # 2026-04-06T09:53:00.669Z
     sunrise_utc = data['result']['sun_info']['sun_times']['sunrise']
     sunset_utc = data['result']['sun_info']['sun_times']['sunset']
