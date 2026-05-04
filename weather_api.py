@@ -96,6 +96,27 @@ def get_weather(lat: float, long: float) -> Weather:
     data = response.json()
     altitude = float(data.get('elevation')[0])
     
+    #job2. obtain UV data
+    url = "https://api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude" : lat,
+        "longitude" : long,
+        "daily" : ["uv_index_max"]
+    }
+    responses = requests.get(url, params=params)
+    print(f'Open Meteo data: ${responses}')
+    
+#     url = "https://api.open-meteo.com/v1/forecast"
+# params = {
+# 	"latitude": 52.52,
+# 	"longitude": 13.41,
+# 	"daily": ["uv_index_max", "uv_index_clear_sky_max"],
+# 	"hourly": "temperature_2m",
+# }
+# responses = openmeteo.weather_api(url, params = params)
+    
+    
+    
     #job 2. obtain UV data  
     openuv_url = 'https://api.openuv.io/api/v1/uv?'
     openuv_headers = {'x-access-token': OPENUV_API_KEY}
