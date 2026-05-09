@@ -6,7 +6,8 @@ class WeatherData {
   final String country;
   final double lat;
   final double long;
-  final String date;
+  final String day;
+  final String monthyear;
   final double maxTemp;
   final double maxUV;
   final String maxuvTimeLocal;
@@ -28,7 +29,8 @@ class WeatherData {
     required this.country,
     required this.lat,
     required this.long,
-    required this.date,
+    required this.day,
+    required this.monthyear,
     required this.maxTemp,
     required this.maxUV,
     required this.maxuvTimeLocal,
@@ -51,12 +53,14 @@ class WeatherData {
     final int cloudiness = (json['cloudiness'] as num).toInt();
     final double maximumUV = (json['max_uv'] as num).toDouble();
     final String weatherDescriptor = (json['weather_description']);
+    final int dateUnix = (json['date']);
     return WeatherData(
       placeName: json['place_name'],
       country: json['country'],
       lat: (json['lat'] as num).toDouble(),
       long: (json['long'] as num).toDouble(),
-      date: json['date'],
+      day: dayFinder(dateUnix),
+      monthyear: monthyearFinder(dateUnix),
       maxUV: maximumUV,
       maxTemp: maxTemp,
       maxuvTimeLocal: json['maxuv_time_local'],
@@ -77,6 +81,42 @@ class WeatherData {
       cloudiness: cloudiness,
     );
   }
+}
+
+String dayFinder(int dateUnix) {
+  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(dateUnix * 1000);
+  const days = [
+    'Monday', //0
+    'Tuesday', //1
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+  int day = dateTime.weekday - 1;
+  return days[day];
+}
+
+String monthyearFinder(int dateUnix) {
+  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(dateUnix * 1000);
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+  String month = months[dateTime.month - 1];
+  String year = dateTime.year.toString();
+  return '$month $year';
 }
 
 String weatherDescriptionFormatter(String text, int cloudiness) {

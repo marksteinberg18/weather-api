@@ -188,6 +188,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: -0.5,
+                                          color: Colors.white,
                                         ),
                                       ),
                                       Row(
@@ -258,6 +259,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: -0.5,
+                                          color: Colors.white,
                                         ),
                                       ),
                                       Row(

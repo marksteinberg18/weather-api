@@ -51,7 +51,7 @@ class Weather:
         self.country = country # ✔
         self.lat = lat # ✔
         self.long = long # ✔
-        self.date = Date.fromisoformat(date) #will need to convert UNIX timestamp to YYYY--MM-DD
+        self.date = date #stored as  UNIX timestamp
         self.max_temp = max_temp #from openweather
         self.max_uv = maxuv_score #from openUV ✔
         self.maxuv_time_local = maxuv_time_local #string ✔
@@ -73,7 +73,7 @@ class Weather:
             "country" : self.country,
             "lat" : self.lat,
             "long" : self.long,
-            "date" : str(self.date),
+            "date" : self.date,
             "max_temp" : self.max_temp,
             "max_uv" : self.max_uv,
             "maxuv_time_local" : self.maxuv_time_local, #local time at this point
@@ -161,7 +161,7 @@ def get_weather(lat: float, long: float) -> Weather:
                                     
     
     #create and return a Weather object
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = data.get('dt')
     
     weather = Weather(
         place_name= data.get('name','Unknown'),
