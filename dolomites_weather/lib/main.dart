@@ -148,17 +148,48 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                       ],
                     ),
                     SizedBox(height: _screenHeight * 0.01),
-                    Text(
-                      _greeting,
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: _white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+
+                    _weatherData == null
+                        ? Text('-')
+                        : AutoSizeText.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '${_weatherData!.day}, ',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Color(0xFFfbf7f5),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              TextSpan(
+                                text: _weatherData!.datemonth,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: Color(0xFFf9f1f1),
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                    // Text(
+                    //   _greeting,
+                    //   style: TextStyle(
+                    //     fontSize: 25,
+                    //     color: _white,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // )
                     Text(
                       _status,
-                      style: TextStyle(fontSize: 20, color: _white),
+                      style: GoogleFonts.capriola(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w200,
+                        color: _weatherData?.uvIndexColor ?? Color(0xFFf9f9f9),
+                        letterSpacing: -1,
+                      ),
                     ),
                     SizedBox(height: _screenHeight * 0.02),
                     Padding(

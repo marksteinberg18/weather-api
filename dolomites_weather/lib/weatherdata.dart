@@ -7,7 +7,7 @@ class WeatherData {
   final double lat;
   final double long;
   final String day;
-  final String monthyear;
+  final String datemonth;
   final double maxTemp;
   final double maxUV;
   final String maxuvTimeLocal;
@@ -30,7 +30,7 @@ class WeatherData {
     required this.lat,
     required this.long,
     required this.day,
-    required this.monthyear,
+    required this.datemonth,
     required this.maxTemp,
     required this.maxUV,
     required this.maxuvTimeLocal,
@@ -60,7 +60,7 @@ class WeatherData {
       lat: (json['lat'] as num).toDouble(),
       long: (json['long'] as num).toDouble(),
       day: dayFinder(dateUnix),
-      monthyear: monthyearFinder(dateUnix),
+      datemonth: datemonthFinder(dateUnix),
       maxUV: maximumUV,
       maxTemp: maxTemp,
       maxuvTimeLocal: json['maxuv_time_local'],
@@ -98,7 +98,7 @@ String dayFinder(int dateUnix) {
   return days[day];
 }
 
-String monthyearFinder(int dateUnix) {
+String datemonthFinder(int dateUnix) {
   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(dateUnix * 1000);
   const months = [
     'January',
@@ -114,9 +114,9 @@ String monthyearFinder(int dateUnix) {
     'November',
     'December',
   ];
+  int date = dateTime.day;
   String month = months[dateTime.month - 1];
-  String year = dateTime.year.toString();
-  return '$month $year';
+  return '$date $month';
 }
 
 String weatherDescriptionFormatter(String text, int cloudiness) {
