@@ -32,18 +32,6 @@ OPENUV_API_KEY = os.getenv('OPENUV_API_KEY')
 app = Flask(__name__)
 CORS(app)
 
-# class Location:
-#     def __init__ (self,place:str, country:str, state:str, lat:float, long:float,):
-#         self.place = place
-#         self.country = country
-#         self.state = state
-#         self.lat = lat
-#         self.long = long
-    
-#     def __str__(self):
-#         state_str = f", {self.state} " if self.state else ""
-#         return(f"Location:\t{self.place}, {self.country} {state_str}is at {self.lat},{self.long}")
-
 class Weather:
     """Initialise a Weather object with location, temperature, UV, and sun data."""
     def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int): 
@@ -148,6 +136,7 @@ def get_weather(lat: float, long: float) -> Weather:
     }
     response = requests.get(url,params=params)
     data = response.json()
+    
     #temp_min = data['main']['temp_min']
     temp_max = data['main']['temp_max']    
     weather_description  = data['weather'][0]['description']
@@ -221,6 +210,27 @@ def test():
         "elevation" : 312.3}
     print (mock_data)
     return jsonify(mock_data)
+
+@app.route('/debug-meteo')
+def debug_meteo():
+    url = 'https://api.open-meteo.com/v1/forecast'
+    lat = request.args.get('lat',51.5072)
+    long = request.args.get('long',-0.1276)
+    params = {
+        "latitude" : lat,
+        "longitude" : long,
+        "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
+        "timezone" : "auto",
+        "forecast_days" : 1
+    }
+    responses = requests.get(url, params=params)
+    data = responses.json()
+    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
+    return jsonify(data)
+    
+#https://open-meteo.com/en/docs?hourly=&forecast_days=1&daily=uv_index_max,temperature_2m_max,sunrise,sunset,weather_code,precipitation_probability_max&timezone=auto
+
+
 
 
 @app.route('/health') #remember this is not weather/health, just /health

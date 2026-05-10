@@ -54,8 +54,11 @@ class WeatherData {
     final double maximumUV = (json['max_uv'] as num).toDouble();
     final String weatherDescriptor = (json['weather_description']);
     final int dateUnix = (json['date']);
+    final String location = json['place_name'];
+
     return WeatherData(
-      placeName: json['place_name'],
+      placeName: location.toLowerCase(),
+      //placeName: json['place_name'],
       country: json['country'],
       lat: (json['lat'] as num).toDouble(),
       long: (json['long'] as num).toDouble(),

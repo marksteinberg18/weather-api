@@ -40,7 +40,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
   final hour = DateTime.now().hour;
   String get _greeting => hour < 12 ? 'Good morning!' : 'Good afternoon!';
   String _status = 'Press button to update.';
-  String _location = '-';
+  //String _location = '-';
+  String _placeName = '-';
+  String _country = '-';
 
   WeatherData? _weatherData;
   //Map<String, dynamic>? _weatherData;
@@ -89,7 +91,9 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
         final data = json.decode(response.body);
         setState(() {
           _weatherData = WeatherData.fromJson(data);
-          _location = '${_weatherData!.placeName}, ${_weatherData!.country}';
+          _placeName = _weatherData!.placeName;
+          _country = _weatherData!.country;
+          //_location = '${_weatherData!.placeName}, ${_weatherData!.country}';
           _status = 'Stay safe in the sun.';
           _loading = false;
         });
@@ -132,17 +136,30 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                       children: [
                         Icon(Icons.settings, color: Colors.white, size: 22),
                         Expanded(
-                          child: Center(
-                            child: AutoSizeText(
-                              _location,
-                              minFontSize: 12,
-                              maxFontSize: 18,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          child: AutoSizeText.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: _placeName,
+                                  style: GoogleFonts.ysabeauSc(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFf9f1f1),
+                                    letterSpacing: -1,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ', $_country',
+                                  style: GoogleFonts.ysabeauSc(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFFf9f1f1),
+                                    letterSpacing: -1,
+                                  ),
+                                ),
+                              ],
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
@@ -397,6 +414,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                         ),
                       ),
                     ),
+                    Text('hello'),
                   ],
                 ),
               ),
