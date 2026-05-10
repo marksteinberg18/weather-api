@@ -28,13 +28,14 @@ load_dotenv() #this contains the API codes
 # Get the keys
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 OPENUV_API_KEY = os.getenv('OPENUV_API_KEY')
+BIGDATA_API_KEY = os.getenv('BIGDATA_API_KEY')
 
 app = Flask(__name__)
 CORS(app)
 
 class Weather:
     """Initialise a Weather object with location, temperature, UV, and sun data."""
-    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_description:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int): 
+    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int, precipitation:int): 
         self.place_name = place_name # ✔ 
         self.country = country # ✔
         self.lat = lat # ✔
@@ -45,11 +46,11 @@ class Weather:
         self.maxuv_time_local = maxuv_time_local #string ✔
         self.sunrise_local = sunrise_local #string ✔
         self.sunset_local = sunset_local #string  ✔
-        self.weather_description = weather_description
         self.weather_icon = weather_icon
         self.burn_times = burn_times
         self.elevation = elevation
         self.cloudiness = cloudiness
+        self.precipitation = precipitation
         
    
         #Remember: weather icon at: http://openweathermap.org/img/w/{weather icon string e.g. 10d}.png
@@ -67,15 +68,15 @@ class Weather:
             "maxuv_time_local" : self.maxuv_time_local, #local time at this point
             "sunrise_local" : self.sunrise_local,
             "sunset_local" : self.sunset_local,
-            "weather_description" : self.weather_description,
             "weather_icon" : self.weather_icon,
             "burn_times" : self.burn_times,
             "elevation" : self.elevation,
-            "cloudiness" : self.cloudiness
+            "cloudiness" : self.cloudiness,
+            "precipitation" : self.precipitation
         }
 
         
-def get_weather(lat: float, long: float) -> Weather:
+def get_weather(lat: float, long: float):  #-> Weather:
     """Get weather data for given coordinates"""
 
     #job 1. establish elevation of lat/long co-ordinates - important for UV index
@@ -84,91 +85,81 @@ def get_weather(lat: float, long: float) -> Weather:
     data = response.json()
     altitude = float(data.get('elevation')[0])
     
-    #job2. obtain UV data
-    url = "https://api.open-meteo.com/v1/forecast"
+    #job2. obtain UV and weather data
+    url = 'https://api.open-meteo.com/v1/forecast'
+    #lat = request.args.get('lat',51.5072)
+    #long = request.args.get('long',-0.1276)
     params = {
         "latitude" : lat,
         "longitude" : long,
-        "daily" : ["uv_index_max"]
+        "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
+        "timezone" : "auto",
+        "forecast_days" : 1
     }
     responses = requests.get(url, params=params)
     data = responses.json()
-    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
     
-#     url = "https://api.open-meteo.com/v1/forecast"
-# params = {
-# 	"latitude": 52.52,
-# 	"longitude": 13.41,
-# 	"daily": ["uv_index_max", "uv_index_clear_sky_max"],
-# 	"hourly": "temperature_2m",
-# }
-# responses = openmeteo.weather_api(url, params = params)
-    
-    
-    
-    #job 2. obtain UV data  
-    openuv_url = 'https://api.openuv.io/api/v1/uv?'
-    openuv_headers = {'x-access-token': OPENUV_API_KEY}
-    openuv_params = {
-        'lat':lat,
-        'lng':long,
-        'alt' : altitude,
-        #'dt': '' - ISA time not used
-        }
-    response = requests.get(openuv_url, headers=openuv_headers, params=openuv_params)
-    data = response.json()
-    uv_max = uv_max_new #<we're getting this from open meteo now, formerly: data.get('result').get('uv_max')
-    uv_max_time_utc = data.get('result').get('uv_max_time') # 2026-04-06T09:53:00.669Z
-    sunrise_utc = data['result']['sun_info']['sun_times']['sunrise']
-    sunset_utc = data['result']['sun_info']['sun_times']['sunset']
-    #print(f'UV max: {uv_max}')
-    #print(f'UTC UV max_time: {uv_max_time_utc}') #
-    
-    #job 3. obtain weather data
-    url = f"https://api.openweathermap.org/data/2.5/weather"
-    #docs:
-    #https://openweathermap.org/api/current?collection=current_forecast
+    #job 3. obtain location details
+    reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
     params = {
-        "lat" : lat,
-        "lon" : long,
-        "appid" : OPENWEATHER_API_KEY,
-        "units" : "metric"
+        "latitude" : lat,
+        "longitude" : long,
+        "localityLanguage" : 'en',
+        "key" : BIGDATA_API_KEY
     }
-    response = requests.get(url,params=params)
+    response = requests.get(reverse_geolocationURL,params=params)
     data = response.json()
+    return data
+
+    #TODO get location details
+        #we need PLACE NAME and COUNTRY
     
-    #temp_min = data['main']['temp_min']
-    temp_max = data['main']['temp_max']    
-    weather_description  = data['weather'][0]['description']
-    weather_icon = data['weather'][0]['icon']
-    cloudiness = data.get('clouds', {}).get('all',0)
+    #job4. check we've got all weather object fields
+    dt = datetime.fromisoformat(data['daily']['time'][0])
+    date = int(dt.timestamp())
+    
+    
+    #     place_name X 
+    #     self.country X
+    #     lat ✔
+    #     long ✔
+    #     date ✔ now converted to UNIX timestamp
+    #     max_temp ✔ 
+    #     maxuv_score ✔
+    #     maxuv_time_local X - this will have to return 00:00 currently. Maybe then can refactor to have hourly UV to find the maximum time and/or display as graph ?
+    #     sunrise_local ✔ (this is local time zone correct, format good 12:45)
+    #     sunset_local  ✔ (this is local time zone correct, format good 12:45)
+    #     weather_icon ✔ e.g. [3] description can be inferred from https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM maybe ?
+    #     burn_times ✔ can be calculated because we have uv max
+    #     elevation ✔ obtained from open-meteo already
+    #     cloudiness ✔ returned as cloud_cover_mean %
+    #     precipitation ✔ NEW FIELD! returned as precipitation_probability_max %
      
-    #job 4. convert the timestamps to local time
-    uvmaxtime_local = utc_to_local(uv_max_time_utc,lat,long)
-    sunrise_local = utc_to_local(sunrise_utc,lat,long)
-    sunset_local = utc_to_local(sunset_utc,lat,long)
+    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026    
+    
                                     
     
     #create and return a Weather object
     today = data.get('dt')
     
-    weather = Weather(
-        place_name= data.get('name','Unknown'),
-        country=data.get('sys', {}).get('country','Unknown'),
-        lat=lat,
-        long=long,
-        date=today,
-        max_temp=temp_max,
-        maxuv_score=uv_max,
-        maxuv_time_local=uvmaxtime_local,
-        sunrise_local=sunrise_local,
-        sunset_local=sunset_local,
-        weather_description=weather_description,
-        weather_icon=weather_icon,
-        burn_times=calculate_burntimes(uv_max),
-        elevation=altitude,
-        cloudiness=cloudiness)
-    return weather  
+    
+    # weather = Weather(
+    #     place_name= data.get('name','Unknown'),
+    #     country=data.get('sys', {}).get('country','Unknown'),
+    #     lat=lat,
+    #     long=long,
+    #     date=today,
+    #     max_temp=temp_max,
+    #     maxuv_score=uv_max,
+    #     maxuv_time_local=uvmaxtime_local,
+    #     sunrise_local=sunrise_local,
+    #     sunset_local=sunset_local,
+    #     weather_description=weather_description,
+    #     weather_icon=weather_icon,
+    #     burn_times=calculate_burntimes(uv_max),
+    #     elevation=altitude,
+    #     cloudiness=cloudiness)
+    
     
 def calculate_burntimes (uv_max: float) -> dict:
     """Calculate burn times in minutes for skin types 1-6 based on UV index."""
@@ -213,20 +204,34 @@ def test():
 
 @app.route('/debug-meteo')
 def debug_meteo():
-    url = 'https://api.open-meteo.com/v1/forecast'
+    reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
     lat = request.args.get('lat',51.5072)
     long = request.args.get('long',-0.1276)
     params = {
         "latitude" : lat,
         "longitude" : long,
-        "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
-        "timezone" : "auto",
-        "forecast_days" : 1
+        "localityLanguage" : 'en',
+        "key" : BIGDATA_API_KEY
     }
-    responses = requests.get(url, params=params)
-    data = responses.json()
-    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
-    return jsonify(data)
+    response = requests.get(reverse_geolocationURL,params=params)
+    data = response.json()
+    return data
+    
+    
+    # url = 'https://api.open-meteo.com/v1/forecast'
+    # lat = request.args.get('lat',51.5072)
+    # long = request.args.get('long',-0.1276)
+    # params = {
+    #     "latitude" : lat,
+    #     "longitude" : long,
+    #     "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
+    #     "timezone" : "auto",
+    #     "forecast_days" : 1
+    # }
+    # responses = requests.get(url, params=params)
+    # data = responses.json()
+    # uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
+    # return jsonify(data)
     
 #https://open-meteo.com/en/docs?hourly=&forecast_days=1&daily=uv_index_max,temperature_2m_max,sunrise,sunset,weather_code,precipitation_probability_max&timezone=auto
 
@@ -288,4 +293,18 @@ if __name__ == '__main__':
     #Cobble Hill, New York 40.6913° N latitude and 73.9972° W longitude
     #https://weather-api-8bte.onrender.com/weather?lat=40.6913&long=-73.9972
  
-
+# WMO Weather interpretation codes (WW)
+# Code	Description
+# 0	Clear sky
+# 1, 2, 3	Mainly clear, partly cloudy, and overcast
+# 45, 48	Fog and depositing rime fog
+# 51, 53, 55	Drizzle: Light, moderate, and dense intensity
+# 56, 57	Freezing Drizzle: Light and dense intensity
+# 61, 63, 65	Rain: Slight, moderate and heavy intensity
+# 66, 67	Freezing Rain: Light and heavy intensity
+# 71, 73, 75	Snow fall: Slight, moderate, and heavy intensity
+# 77	Snow grains
+# 80, 81, 82	Rain showers: Slight, moderate, and violent
+# 85, 86	Snow showers slight and heavy
+# 95 *	Thunderstorm: Slight or moderate
+# 96, 99 *	Thunderstorm with slight and heavy hail
