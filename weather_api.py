@@ -35,7 +35,7 @@ CORS(app)
 
 class Weather:
     """Initialise a Weather object with location, temperature, UV, and sun data."""
-    def __init__(self,place_name:str, country:str, lat:float, long:float, date:str, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int, precipitation:int): 
+    def __init__(self,place_name:str, country:str, lat:float, long:float, date:int, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int, precipitation:int): 
         self.place_name = place_name # ✔ 
         self.country = country # ✔
         self.lat = lat # ✔
@@ -49,8 +49,8 @@ class Weather:
         self.weather_icon = weather_icon
         self.burn_times = burn_times
         self.elevation = elevation
-        self.cloudiness = cloudiness
-        self.precipitation = precipitation
+        self.cloudiness = cloudiness # %
+        self.precipitation = precipitation # %
         
    
         #Remember: weather icon at: http://openweathermap.org/img/w/{weather icon string e.g. 10d}.png
@@ -98,6 +98,7 @@ def get_weather(lat: float, long: float):  #-> Weather:
     }
     responses = requests.get(url, params=params)
     data = responses.json()
+    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026    
     
     #job 3. obtain location details
     reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
@@ -109,18 +110,15 @@ def get_weather(lat: float, long: float):  #-> Weather:
     }
     response = requests.get(reverse_geolocationURL,params=params)
     data = response.json()
-    return data
+    cityName = data['city']
+    countryName = data['countryCode']
 
-    #TODO get location details
-        #we need PLACE NAME and COUNTRY
-    
     #job4. check we've got all weather object fields
-    dt = datetime.fromisoformat(data['daily']['time'][0])
-    date = int(dt.timestamp())
+    dt = datetime.fromisoformat(data['daily']['time'][0]) #2026-05-12
+    date = int(dt.timestamp()) #stored as UNIX timestamp
     
-    
-    #     place_name X 
-    #     self.country X
+    #     place_name ✔
+    #     self.country ✔
     #     lat ✔
     #     long ✔
     #     date ✔ now converted to UNIX timestamp
@@ -133,32 +131,29 @@ def get_weather(lat: float, long: float):  #-> Weather:
     #     burn_times ✔ can be calculated because we have uv max
     #     elevation ✔ obtained from open-meteo already
     #     cloudiness ✔ returned as cloud_cover_mean %
-    #     precipitation ✔ NEW FIELD! returned as precipitation_probability_max %
-     
-    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026    
-    
-                                    
+    #     precipitation ✔ NEW FIELD! returned as precipitation_probability_max % 
+    uv_maximum = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
     
     #create and return a Weather object
-    today = data.get('dt')
+    weather = Weather(
+        place_name= cityName, #✔
+        country=countryName, #✔
+        lat=lat, #✔
+        long=long, #✔
+        date=date, #✔ - UNIX timestamp
+        max_temp=data['daily']['temperature_2m_max'], #✔
+        maxuv_score=uv_maximum, #✔
+        maxuv_time_local=data['daily'][], #will need more work
+        sunrise_local=data['daily'][],
+        sunset_local=data['daily'][],
+        weather_icon=data['daily'][],
+        burn_times=calculate_burntimes(uv_maximum),
+        elevation=altitude,
+        cloudiness=data['daily'][],
+        precipitation=data['daily'][])
     
-    
-    # weather = Weather(
-    #     place_name= data.get('name','Unknown'),
-    #     country=data.get('sys', {}).get('country','Unknown'),
-    #     lat=lat,
-    #     long=long,
-    #     date=today,
-    #     max_temp=temp_max,
-    #     maxuv_score=uv_max,
-    #     maxuv_time_local=uvmaxtime_local,
-    #     sunrise_local=sunrise_local,
-    #     sunset_local=sunset_local,
-    #     weather_description=weather_description,
-    #     weather_icon=weather_icon,
-    #     burn_times=calculate_burntimes(uv_max),
-    #     elevation=altitude,
-    #     cloudiness=cloudiness)
+    #data['daily']['temperature_2m_max']
+    #data['daily']['weather_code']
     
     
 def calculate_burntimes (uv_max: float) -> dict:
@@ -202,36 +197,38 @@ def test():
     print (mock_data)
     return jsonify(mock_data)
 
-@app.route('/debug-meteo')
+@app.route('/debug-reverse')
 def debug_meteo():
-    reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
-    lat = request.args.get('lat',51.5072)
-    long = request.args.get('long',-0.1276)
-    params = {
-        "latitude" : lat,
-        "longitude" : long,
-        "localityLanguage" : 'en',
-        "key" : BIGDATA_API_KEY
-    }
-    response = requests.get(reverse_geolocationURL,params=params)
-    data = response.json()
-    return data
-    
-    
-    # url = 'https://api.open-meteo.com/v1/forecast'
+    # reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
     # lat = request.args.get('lat',51.5072)
     # long = request.args.get('long',-0.1276)
     # params = {
     #     "latitude" : lat,
     #     "longitude" : long,
-    #     "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
-    #     "timezone" : "auto",
-    #     "forecast_days" : 1
+    #     "localityLanguage" : 'en',
+    #     "key" : BIGDATA_API_KEY
     # }
-    # responses = requests.get(url, params=params)
-    # data = responses.json()
-    # uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
-    # return jsonify(data)
+    # response = requests.get(reverse_geolocationURL,params=params)
+    # data = response.json()
+    # cityName = data['city']
+    # countryName = data['countryCode']
+    # return f'{cityName}, {countryName}'
+    
+    
+    url = 'https://api.open-meteo.com/v1/forecast'
+    lat = request.args.get('lat',51.5072)
+    long = request.args.get('long',-0.1276)
+    params = {
+        "latitude" : lat,
+        "longitude" : long,
+        "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
+        "timezone" : "auto",
+        "forecast_days" : 1
+    }
+    responses = requests.get(url, params=params)
+    data = responses.json()
+    return jsonify(data)
+
     
 #https://open-meteo.com/en/docs?hourly=&forecast_days=1&daily=uv_index_max,temperature_2m_max,sunrise,sunset,weather_code,precipitation_probability_max&timezone=auto
 
@@ -274,7 +271,7 @@ def weather_endpoint():
         weather = get_weather(lat,long)
         
         #Return as JSON
-        return jsonify(weather.to_dict())
+        #return jsonify(weather.to_dict())
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
