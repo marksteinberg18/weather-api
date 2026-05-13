@@ -35,7 +35,7 @@ CORS(app)
 
 class Weather:
     """Initialise a Weather object with location, temperature, UV, and sun data."""
-    def __init__(self,place_name:str, country:str, lat:float, long:float, date:int, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int, precipitation:int): 
+    def __init__(self,place_name:str, country:str, lat:float, long:float, date:int, max_temp:float, maxuv_score:float, maxuv_time_local:str, sunrise_local:str, sunset_local:str, weather_icon:str, burn_times: dict, elevation:float, cloudiness:int, precipitation:int, hourly_uv:list): 
         self.place_name = place_name # ✔ 
         self.country = country # ✔
         self.lat = lat # ✔
@@ -51,6 +51,7 @@ class Weather:
         self.elevation = elevation
         self.cloudiness = cloudiness # %
         self.precipitation = precipitation # %
+        self.hourly_uv = hourly_uv 
         
    
         #Remember: weather icon at: http://openweathermap.org/img/w/{weather icon string e.g. 10d}.png
@@ -72,18 +73,20 @@ class Weather:
             "burn_times" : self.burn_times,
             "elevation" : self.elevation,
             "cloudiness" : self.cloudiness,
-            "precipitation" : self.precipitation
+            "precipitation" : self.precipitation,
+            "hourly_uv" : self.hourly_uv
+            
         }
 
         
-def get_weather(lat: float, long: float):  #-> Weather:
+def get_weather(lat: float, long: float)  -> Weather:
     """Get weather data for given coordinates"""
 
     #job 1. establish elevation of lat/long co-ordinates - important for UV index
     url = f'https://api.open-meteo.com/v1/elevation?latitude={lat}&longitude={long}'
     response = requests.get(url)
-    data = response.json()
-    altitude = float(data.get('elevation')[0])
+    data_elevation = response.json()
+    altitude = float(data_elevation.get('elevation')[0])
     
     #job2. obtain UV and weather data
     url = 'https://api.open-meteo.com/v1/forecast'
@@ -94,11 +97,12 @@ def get_weather(lat: float, long: float):  #-> Weather:
         "longitude" : long,
         "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
         "timezone" : "auto",
-        "forecast_days" : 1
+        "forecast_days" : 1,
+        "hourly" : ['uv_index']
     }
     responses = requests.get(url, params=params)
-    data = responses.json()
-    uv_max_new = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026    
+    data_meteo = responses.json()
+    uv_max_new = data_meteo['daily']['uv_index_max'][0] #3.65 on 4 May 2026    
     
     #job 3. obtain location details
     reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
@@ -109,12 +113,12 @@ def get_weather(lat: float, long: float):  #-> Weather:
         "key" : BIGDATA_API_KEY
     }
     response = requests.get(reverse_geolocationURL,params=params)
-    data = response.json()
-    cityName = data['city']
-    countryName = data['countryCode']
+    data_geolocation = response.json()
+    cityName = data_geolocation['city']
+    countryName = data_geolocation['countryCode']
 
     #job4. check we've got all weather object fields
-    dt = datetime.fromisoformat(data['daily']['time'][0]) #2026-05-12
+    dt = datetime.fromisoformat(data_meteo['daily']['time'][0]) #2026-05-12
     date = int(dt.timestamp()) #stored as UNIX timestamp
     
     #     place_name ✔
@@ -132,7 +136,9 @@ def get_weather(lat: float, long: float):  #-> Weather:
     #     elevation ✔ obtained from open-meteo already
     #     cloudiness ✔ returned as cloud_cover_mean %
     #     precipitation ✔ NEW FIELD! returned as precipitation_probability_max % 
-    uv_maximum = data['daily']['uv_index_max'][0] #3.65 on 4 May 2026
+    uv_maximum = data_meteo['daily']['uv_index_max'][0] #3.65 on 4 May 2026
+    hourly_uv = data_meteo['hourly']['uv_index']
+    indexOfMaxUV = hourly_uv.index(max(hourly_uv))
     
     #create and return a Weather object
     weather = Weather(
@@ -141,19 +147,19 @@ def get_weather(lat: float, long: float):  #-> Weather:
         lat=lat, #✔
         long=long, #✔
         date=date, #✔ - UNIX timestamp
-        max_temp=data['daily']['temperature_2m_max'], #✔
+        max_temp=data_meteo['daily']['temperature_2m_max'][0], #✔
         maxuv_score=uv_maximum, #✔
-        maxuv_time_local=data['daily'][], #will need more work
-        sunrise_local=data['daily'][],
-        sunset_local=data['daily'][],
-        weather_icon=data['daily'][],
+        maxuv_time_local=f"{indexOfMaxUV:02d}:00",
+        sunrise_local=data_meteo['daily']['sunrise'][0][-5:],
+        sunset_local=data_meteo['daily']['sunset'][0][-5:],
+        weather_icon=data_meteo['daily']['weather_code'][0],
         burn_times=calculate_burntimes(uv_maximum),
         elevation=altitude,
-        cloudiness=data['daily'][],
-        precipitation=data['daily'][])
-    
-    #data['daily']['temperature_2m_max']
-    #data['daily']['weather_code']
+        cloudiness=data_meteo['daily']['cloud_cover_mean'][0],
+        precipitation=data_meteo['daily']['precipitation_probability_max'][0],
+        hourly_uv=data_meteo['hourly']['uv_index']
+        )
+    return weather
     
     
 def calculate_burntimes (uv_max: float) -> dict:
@@ -165,13 +171,13 @@ def calculate_burntimes (uv_max: float) -> dict:
          
         
         
-def utc_to_local(utc_str: str, lat:float, long:float) ->str:
-    """Convert a UTC timestamp string to local time string using coordinates to determine timezone."""
-    dt = datetime.fromisoformat(utc_str.replace("Z","+00:00"))
-    tf = TimezoneFinder()
-    tz_name = str(tf.timezone_at(lat=lat,lng=long))
-    local_dt = dt.astimezone(ZoneInfo(tz_name))
-    return local_dt.strftime("%H:%M")
+# def utc_to_local(utc_str: str, lat:float, long:float) ->str:
+#     """Convert a UTC timestamp string to local time string using coordinates to determine timezone."""
+#     dt = datetime.fromisoformat(utc_str.replace("Z","+00:00"))
+#     tf = TimezoneFinder()
+#     tz_name = str(tf.timezone_at(lat=lat,lng=long))
+#     local_dt = dt.astimezone(ZoneInfo(tz_name))
+#     return local_dt.strftime("%H:%M")
 
           
 # API Endpoints - no main() needed now
@@ -271,7 +277,7 @@ def weather_endpoint():
         weather = get_weather(lat,long)
         
         #Return as JSON
-        #return jsonify(weather.to_dict())
+        return jsonify(weather.to_dict())
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
