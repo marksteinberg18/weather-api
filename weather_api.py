@@ -1,33 +1,15 @@
-#A program that:
-# Gets weather data for any city from a free API
-# Stores favourite cities
-# Shows current weather + 5-day forecast
-# Compares weather between multiple cities
-# Saves historical lookups to JSON
 
-# Menu options:
-    # View weather for a city - maximum temperature and maximum UV (and time of that)
-    # Add city to favourites
-    # View all favourite cities' weather
-    # Compare weather between cities
-    # View weather history
-    # Remove favourite city
-    # Quit
 from flask import Flask, jsonify, request
 from flask_cors import CORS    
 import os
-from datetime import date as Date, datetime
-from zoneinfo import ZoneInfo
 import requests
-from timezonefinder import TimezoneFinder
 from dotenv import load_dotenv
+from datetime import date as datetime
 
 # Load environment variables
 load_dotenv() #this contains the API codes
 
 # Get the keys
-OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
-OPENUV_API_KEY = os.getenv('OPENUV_API_KEY')
 BIGDATA_API_KEY = os.getenv('BIGDATA_API_KEY')
 
 app = Flask(__name__)
@@ -102,7 +84,6 @@ def get_weather(lat: float, long: float)  -> Weather:
     }
     responses = requests.get(url, params=params)
     data_meteo = responses.json()
-    uv_max_new = data_meteo['daily']['uv_index_max'][0] #3.65 on 4 May 2026    
     
     #job 3. obtain location details
     reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
@@ -128,7 +109,6 @@ def get_weather(lat: float, long: float)  -> Weather:
     #     date ✔ now converted to UNIX timestamp
     #     max_temp ✔ 
     #     maxuv_score ✔
-    #     maxuv_time_local X - this will have to return 00:00 currently. Maybe then can refactor to have hourly UV to find the maximum time and/or display as graph ?
     #     sunrise_local ✔ (this is local time zone correct, format good 12:45)
     #     sunset_local  ✔ (this is local time zone correct, format good 12:45)
     #     weather_icon ✔ e.g. [3] description can be inferred from https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM maybe ?
@@ -136,6 +116,8 @@ def get_weather(lat: float, long: float)  -> Weather:
     #     elevation ✔ obtained from open-meteo already
     #     cloudiness ✔ returned as cloud_cover_mean %
     #     precipitation ✔ NEW FIELD! returned as precipitation_probability_max % 
+    #     hourly_uv ✔ LIST
+    
     uv_maximum = data_meteo['daily']['uv_index_max'][0] #3.65 on 4 May 2026
     hourly_uv = data_meteo['hourly']['uv_index']
     indexOfMaxUV = hourly_uv.index(max(hourly_uv))
@@ -157,7 +139,7 @@ def get_weather(lat: float, long: float)  -> Weather:
         elevation=altitude,
         cloudiness=data_meteo['daily']['cloud_cover_mean'][0],
         precipitation=data_meteo['daily']['precipitation_probability_max'][0],
-        hourly_uv=data_meteo['hourly']['uv_index']
+        hourly_uv=hourly_uv
         )
     return weather
     
@@ -169,76 +151,12 @@ def calculate_burntimes (uv_max: float) -> dict:
         burn_dict[str(i)] = round((200*i) / (3*uv_max))
     return burn_dict
          
-        
-        
-# def utc_to_local(utc_str: str, lat:float, long:float) ->str:
-#     """Convert a UTC timestamp string to local time string using coordinates to determine timezone."""
-#     dt = datetime.fromisoformat(utc_str.replace("Z","+00:00"))
-#     tf = TimezoneFinder()
-#     tz_name = str(tf.timezone_at(lat=lat,lng=long))
-#     local_dt = dt.astimezone(ZoneInfo(tz_name))
-#     return local_dt.strftime("%H:%M")
 
           
 # API Endpoints - no main() needed now
 
-@app.route('/test')
-def test():
-    """Mock data return to save external API calls"""
-    mock_data = {
-        "place_name" : "Cobble Hill",
-        "country" : "NY",
-        "lat" : 123.4,
-        "long" : 5678.9,
-        "date" : "2026-05-02",
-        "max_temp" : 36.2,
-        "max_uv" : 11.32,
-        "maxuv_time_local" : "13:46",
-        "sunrise_local" : "06:45",
-        "sunset_local" : "21:05",
-        "weather_description" : "sunny",
-        "weather_icon" : "10d",
-        "burn_times" : calculate_burntimes(4.32),
-        "elevation" : 312.3}
-    print (mock_data)
-    return jsonify(mock_data)
-
-@app.route('/debug-reverse')
-def debug_meteo():
-    # reverse_geolocationURL = 'https://api-bdc.net/data/reverse-geocode'
-    # lat = request.args.get('lat',51.5072)
-    # long = request.args.get('long',-0.1276)
-    # params = {
-    #     "latitude" : lat,
-    #     "longitude" : long,
-    #     "localityLanguage" : 'en',
-    #     "key" : BIGDATA_API_KEY
-    # }
-    # response = requests.get(reverse_geolocationURL,params=params)
-    # data = response.json()
-    # cityName = data['city']
-    # countryName = data['countryCode']
-    # return f'{cityName}, {countryName}'
-    
-    
-    url = 'https://api.open-meteo.com/v1/forecast'
-    lat = request.args.get('lat',51.5072)
-    long = request.args.get('long',-0.1276)
-    params = {
-        "latitude" : lat,
-        "longitude" : long,
-        "daily" : ['uv_index_max','temperature_2m_max','sunrise','sunset','weather_code','precipitation_probability_max','cloud_cover_mean'],
-        "timezone" : "auto",
-        "forecast_days" : 1
-    }
-    responses = requests.get(url, params=params)
-    data = responses.json()
-    return jsonify(data)
-
     
 #https://open-meteo.com/en/docs?hourly=&forecast_days=1&daily=uv_index_max,temperature_2m_max,sunrise,sunset,weather_code,precipitation_probability_max&timezone=auto
-
-
 
 
 @app.route('/health') #remember this is not weather/health, just /health
@@ -311,3 +229,5 @@ if __name__ == '__main__':
 # 85, 86	Snow showers slight and heavy
 # 95 *	Thunderstorm: Slight or moderate
 # 96, 99 *	Thunderstorm with slight and heavy hail
+
+#https://pub.dev/packages/weather_icons/versions/3.0.0
