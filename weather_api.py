@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 import requests
 from dotenv import load_dotenv
-from datetime import date as datetime
+from datetime import datetime
 
 # Load environment variables
 load_dotenv() #this contains the API codes
