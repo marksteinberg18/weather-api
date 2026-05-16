@@ -1,28 +1,57 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'package:weather_icons/weather_icons.dart';
+
+//JSON return this....
+// {
+//  1 "burn_times": {
+//     "1": 34,
+//     "2": 68,
+//     "3": 103,
+//     "4": 137,
+//     "5": 171,
+//     "6": 205
+//   },
+//   2"cloudiness": 88,
+//   3"country": "IT",
+//   4"date": 1778716800,
+//   5"elevation": 1220,
+//   6"hourly_uv": [0, 0, 0, 0, 0, 0, 0, 0.1, 0.4, 1.2, 1.95, 1.05, 0.85, 0.8, 1.35, 1.55, 0.9, 0.5, 0.4, 0.3, 0.1, 0, 0, 0],
+//   7"lat": 46.5405,
+//   8"long": 12.1357,
+//   9"max_temp": 6.9,
+//   10"max_uv": 1.95,
+//   11"maxuv_time_local": "10:00",
+//   12"place_name": "Cortina d'Ampezzo",
+//   13"precipitation": 100,
+//   14"sunrise_local": "05:38",
+//   15"sunset_local": "20:36",
+//   16"weather_icon": 80
+// }
 
 class WeatherData {
-  final String placeName;
-  final String country;
-  final double lat;
-  final double long;
-  final String day;
-  final String datemonth;
-  final double maxTemp;
-  final double maxUV;
-  final String maxuvTimeLocal;
-  final String sunriseLocal;
-  final String sunsetLocal;
-  final String weatherDescription;
-  final String weatherIcon;
-  final Map<String, int> burnTimes;
-  final double elevation;
-  final String informalWeather;
-  final Color temperatureColor;
-  final Color uvIndexColor;
-  final String uvAction;
-  final String uvLabel;
-  final int cloudiness;
+  //✔ = coming from API  @ = internally assigned
+  final String placeName; //✔
+  final String country; //✔
+  final double lat; //✔
+  final double long; //✔
+  final String day; //@  based on UNIX timecode
+  final String datemonth; //@ based on UNIX timecode
+  final double maxTemp; //✔
+  final double maxUV; //✔
+  final String maxuvTimeLocal; //✔
+  final String sunriseLocal; //✔
+  final String sunsetLocal; //✔
+  final IconData weatherIcon; //✔
+  final Map<String, int> burnTimes; //✔
+  final double elevation; //✔
+  final String informalWeather; //@
+  final Color temperatureColor; //@
+  final Color uvIndexColor; //@
+  final String uvAction; //@
+  final String uvLabel; //@
+  final int cloudiness; //✔
+  final int precipitation; //✔
+  final List<double> hourlyUV; //✔
 
   WeatherData({
     required this.placeName,
@@ -36,7 +65,6 @@ class WeatherData {
     required this.maxuvTimeLocal,
     required this.sunriseLocal,
     required this.sunsetLocal,
-    required this.weatherDescription,
     required this.weatherIcon,
     required this.burnTimes,
     required this.elevation,
@@ -46,15 +74,18 @@ class WeatherData {
     required this.uvAction,
     required this.uvLabel,
     required this.cloudiness,
+    required this.precipitation,
+    required this.hourlyUV,
   });
 
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     final maxTemp = (json['max_temp'] as num).toDouble();
     final int cloudiness = (json['cloudiness'] as num).toInt();
+    final int precipitation = (json['precipitation'] as num).toInt();
     final double maximumUV = (json['max_uv'] as num).toDouble();
-    final String weatherDescriptor = (json['weather_description']);
     final int dateUnix = (json['date']);
     final String location = json['place_name'];
+    final int weatherIcon = json['weather_icon'];
 
     return WeatherData(
       placeName: location.toLowerCase(),
@@ -69,11 +100,7 @@ class WeatherData {
       maxuvTimeLocal: json['maxuv_time_local'],
       sunriseLocal: json['sunrise_local'],
       sunsetLocal: json['sunset_local'],
-      weatherDescription: weatherDescriptionFormatter(
-        weatherDescriptor,
-        cloudiness,
-      ),
-      weatherIcon: json['weather_icon'],
+      weatherIcon: assignWeatherIcon(weatherIcon),
       burnTimes: Map<String, int>.from(json['burn_times']),
       elevation: json['elevation'],
       informalWeather: informalWeatherFinder(maxTemp),
@@ -82,8 +109,73 @@ class WeatherData {
       uvAction: uvActionFinder(maximumUV),
       uvLabel: uvLabelFinder(maximumUV),
       cloudiness: cloudiness,
+      precipitation: precipitation,
+      hourlyUV: List<double>.from(json['hourly_uv']),
     );
   }
+}
+
+IconData assignWeatherIcon(int weatherCode) {
+  switch (weatherCode) {
+    case 0:
+      return WeatherIcons.day_sunny;
+    case 1:
+      return WeatherIcons.day_cloudy;
+    case 2:
+      return WeatherIcons.day_cloudy_high;
+    case 3:
+      return WeatherIcons.cloudy;
+    case 45:
+    case 48:
+      return WeatherIcons.fog;
+    case 51:
+    case 53:
+    case 55:
+      return WeatherIcons.sprinkle;
+    case 56:
+    case 57:
+    case 66:
+    case 67:
+    case 77:
+      return WeatherIcons.sleet;
+    case 61:
+    case 63:
+    case 80:
+    case 81:
+      return WeatherIcons.raindrops;
+    case 65:
+    case 82:
+      return WeatherIcons.rain;
+    case 71:
+    case 73:
+    case 85:
+      return WeatherIcons.snow;
+    case 75:
+    case 86:
+      return WeatherIcons.snowflake_cold;
+    case 95:
+    case 96:
+    case 99:
+      return WeatherIcons.thunderstorm;
+  }
+  return WeatherIcons.na; //fallback for unrecognised code
+
+  // WMO Weather interpretation codes (WW)
+  // Code	Description
+  // 0	Clear sky
+  // 1, 2, 3	Mainly clear, partly cloudy, and overcast
+  // 45, 48	Fog and depositing rime fog
+  // 51, 53, 55	Drizzle: Light, moderate, and dense intensity
+  // 56, 57	Freezing Drizzle: Light and dense intensity
+  // 61, 63, 65	Rain: Slight, moderate and heavy intensity
+  // 66, 67	Freezing Rain: Light and heavy intensity
+  // 71, 73, 75	Snow fall: Slight, moderate, and heavy intensity
+  // 77	Snow grains
+  // 80, 81, 82	Rain showers: Slight, moderate, and violent
+
+  // 85, 86	Snow showers slight and heavy
+  // 95 *	Thunderstorm: Slight or moderate
+  // 96, 99 *	Thunderstorm with slight and heavy hail
 }
 
 String dayFinder(int dateUnix) {
@@ -120,13 +212,6 @@ String datemonthFinder(int dateUnix) {
   int date = dateTime.day;
   String month = months[dateTime.month - 1];
   return '$date $month';
-}
-
-String weatherDescriptionFormatter(String text, int cloudiness) {
-  String capitalisedWord =
-      text[0].toUpperCase() + text.substring(1).toLowerCase();
-  //capitalisedWord = '$capitalisedWord ($cloudiness%)';
-  return capitalisedWord;
 }
 
 String uvActionFinder(double uv) {
@@ -174,21 +259,19 @@ Color temperatureColorFinder(double temp) {
 }
 
 String informalWeatherFinder(double temp) {
-  if (temp <= 2) return 'Freezing! Coat, gloves, hat.';
-  if (temp <= 5) return 'Thick winter coat zipped up.';
-  if (temp <= 8) return 'Cold - coat firmly on.';
-  if (temp <= 11) return 'Chilly - light coat or layers.';
-  if (temp <= 14) return 'Cool - jacket weather.';
-  if (temp <= 17) return 'Light jacket/jumper weather.';
-  if (temp <= 20) return 'T-shirt with backup layer.';
-  if (temp <= 23) return 'T-shirt weather.';
-  if (temp <= 26) return 'Shorts and T-shirts.';
-  if (temp <= 28) return 'Hot - seeking shade.';
-  return 'Very hot - too warm to function.';
+  if (temp <= 2) return 'Freezing! Coat, gloves, hat';
+  if (temp <= 5) return 'Thick winter coat zipped up';
+  if (temp <= 8) return 'Cold - coat zipped up';
+  if (temp <= 11) return 'Chilly - light coat or layers';
+  if (temp <= 14) return 'Cool - jacket weather';
+  if (temp <= 17) return 'Light jacket/jumper weather';
+  if (temp <= 20) return 'T-shirt with backup layer';
+  if (temp <= 23) return 'T-shirt weather';
+  if (temp <= 26) return 'Shorts and T-shirts';
+  if (temp <= 28) return 'Hot - seeking shade';
+  return 'Very hot - too warm to function';
 }
 
-///String informalWeather(double temp) {
-//}
 
 // 0–2 °C — Freezing – big coat, gloves, regret
 // 3–5 °C — Winter insulated coat weather
@@ -203,27 +286,3 @@ String informalWeatherFinder(double temp) {
 // 29–30 °C — Very hot – too warm to function properly
 
 
-//JSON return this....
-//   {
-//   "burn_times": {
-//     "1": 15,
-//     "2": 31,
-//     "3": 46,
-//     "4": 62,
-//     "5": 77,
-//     "6": 93
-//   },
-//   "country": "Sam's new home",
-//   "date": "2026-05-02",
-//   "elevation": 312.3,
-//   "lat": 123,
-//   "long": 456,
-//   "max_temp": 21.2,
-//   "max_uv": 4.32,
-//   "maxuv_time_local": "13:46",
-//   "place_name": "Cobble Hill",
-//   "sunrise_local": "06:45",
-//   "sunset_local": "21:05",
-//   "weather_description": "sunny",
-//   "weather_icon": "10d"
-// }
