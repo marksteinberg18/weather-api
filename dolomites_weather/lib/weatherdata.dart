@@ -1,5 +1,3 @@
-import 'dart:nativewrappers/_internal/vm/lib/ffi_native_type_patch.dart';
-
 import 'package:flutter/material.dart';
 import 'package:weather_icons/weather_icons.dart';
 
@@ -266,7 +264,7 @@ String informalWeatherFinder(double temp) {
   if (temp <= 8) return 'Cold - coat zipped up';
   if (temp <= 11) return 'Chilly - light coat or layers';
   if (temp <= 14) return 'Cool - jacket weather';
-  if (temp <= 17) return 'Light jacket/jumper weather';
+  if (temp <= 17) return 'Light jacket or jumper weather';
   if (temp <= 20) return 'T-shirt with backup layer';
   if (temp <= 23) return 'T-shirt weather';
   if (temp <= 26) return 'Shorts and T-shirts';

@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:weather_icons/weather_icons.dart';
 import 'weatherdata.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
@@ -11,6 +12,7 @@ void main() {
 }
 
 const _white = Colors.white;
+const _offWhite = Color(0xFFF5F5F5);
 
 class UVWeatherApp extends StatelessWidget {
   const UVWeatherApp({super.key});
@@ -280,6 +282,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                         style: TextStyle(
                                           fontSize: 9,
                                           fontWeight: FontWeight.bold,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ],
@@ -354,30 +357,35 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                       ),
                                       _weatherData == null
                                           ? Text('')
-                                          : RichText(
-                                            text: TextSpan(
-                                              style: TextStyle(
-                                                color: Colors.black,
+                                          : Row(
+                                            children: [
+                                              Icon(
+                                                WeatherIcons.rain_mix,
+                                                size: 9,
+                                                color: _offWhite,
                                               ),
-                                              children: [
-                                                TextSpan(
-                                                  text: 'weather description',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w900,
-                                                  ),
+                                              Text(
+                                                ' ${_weatherData!.precipitation}%\t\t\t\t',
+                                                style: TextStyle(
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w200,
+                                                  color: _offWhite,
                                                 ),
-                                                TextSpan(
-                                                  text:
-                                                      ' (${_weatherData!.cloudiness.toString()}%)',
-                                                  style: TextStyle(
-                                                    fontSize: 9,
-                                                    fontWeight: FontWeight.w600,
-                                                    letterSpacing: 0,
-                                                  ),
+                                              ),
+                                              Icon(
+                                                WeatherIcons.cloudy,
+                                                size: 9,
+                                                color: _offWhite,
+                                              ),
+                                              Text(
+                                                ' ${_weatherData!.cloudiness}%',
+                                                style: TextStyle(
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w200,
+                                                  color: _offWhite,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                       Row(
                                         children: [
@@ -386,11 +394,11 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                                 Icons.flutter_dash,
                                                 size: 20,
                                               )
-                                              : Image.network(
-                                                'https://openweathermap.org/payload/api/media/file/${_weatherData?.weatherIcon}.png',
-                                                width: 50,
-                                                height: 40,
+                                              : Icon(
+                                                _weatherData!.weatherIcon,
+                                                size: 20,
                                               ),
+
                                           _weatherData == null
                                               ? Text('')
                                               : Expanded(
@@ -398,7 +406,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                                   _weatherData!.informalWeather,
                                                   textAlign: TextAlign.left,
                                                   style: TextStyle(
-                                                    //letterSpacing: 1,
+                                                    letterSpacing: 1,
                                                     fontSize: 9,
                                                   ),
                                                 ),
