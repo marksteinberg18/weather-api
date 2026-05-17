@@ -81,10 +81,14 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
 
       //Build the URL
       //Testing: Luxor 25.6872° N, 32.6396° E
+
       final url = Uri.parse(
         '$apiUrl?lat=${position.latitude}&long=${position.longitude}',
       ); //not used for testing
-      //final url = Uri.parse('$apiUrl?lat25.6872=&long=32.6396'); //Luxor
+      //final url = Uri.parse('$apiUrl?lat=25.6872&long=32.6396'); //Luxor
+
+      //-20.917574, and the longitude is 142.702789 = Queensland Au
+      //final url = Uri.parse('$apiUrl?lat=-20.917574&long=142.702789');
 
       final response = await http.get(url);
       //final response = await http.get(
@@ -359,57 +363,79 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                           ? Text('')
                                           : Row(
                                             children: [
-                                              Icon(
-                                                WeatherIcons.rain_mix,
-                                                size: 9,
-                                                color: _offWhite,
-                                              ),
-                                              Text(
-                                                ' ${_weatherData!.precipitation}%\t\t\t\t',
-                                                style: TextStyle(
-                                                  fontSize: 9,
-                                                  fontWeight: FontWeight.w200,
-                                                  color: _offWhite,
-                                                ),
-                                              ),
-                                              Icon(
-                                                WeatherIcons.cloudy,
-                                                size: 9,
-                                                color: _offWhite,
-                                              ),
-                                              Text(
-                                                ' ${_weatherData!.cloudiness}%',
-                                                style: TextStyle(
-                                                  fontSize: 9,
-                                                  fontWeight: FontWeight.w200,
-                                                  color: _offWhite,
-                                                ),
-                                              ),
+                                              _weatherData == null
+                                                  ? Icon(
+                                                    Icons.flutter_dash,
+                                                    size: 20,
+                                                  )
+                                                  : Row(
+                                                    children: [
+                                                      Icon(
+                                                        _weatherData!
+                                                            .weatherIcon,
+                                                        size: 20,
+                                                        color: _offWhite,
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                    ],
+                                                  ),
+                                              _weatherData == null
+                                                  ? Text('')
+                                                  : Expanded(
+                                                    child: Text(
+                                                      '${_weatherData!.informalWeather}',
+                                                      textAlign: TextAlign.left,
+                                                      style: TextStyle(
+                                                        letterSpacing: 1,
+                                                        fontSize: 9,
+                                                        color: _offWhite,
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                      ),
+                                                    ),
+                                                  ),
                                             ],
                                           ),
                                       Row(
                                         children: [
                                           _weatherData == null
-                                              ? Icon(
-                                                Icons.flutter_dash,
-                                                size: 20,
-                                              )
-                                              : Icon(
-                                                _weatherData!.weatherIcon,
-                                                size: 20,
-                                              ),
-
-                                          _weatherData == null
                                               ? Text('')
-                                              : Expanded(
-                                                child: Text(
-                                                  _weatherData!.informalWeather,
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(
-                                                    letterSpacing: 1,
-                                                    fontSize: 9,
+                                              : Column(
+                                                children: [
+                                                  SizedBox(height: 10),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        WeatherIcons.rain_mix,
+                                                        size: 9,
+                                                        color: Colors.black,
+                                                      ),
+                                                      Text(
+                                                        ' ${_weatherData!.precipitation}%\t\t\t\t',
+                                                        style: TextStyle(
+                                                          fontSize: 9,
+                                                          fontWeight:
+                                                              FontWeight.w200,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                      Icon(
+                                                        WeatherIcons.cloudy,
+                                                        size: 9,
+                                                        color: Colors.black,
+                                                      ),
+                                                      Text(
+                                                        ' ${_weatherData!.cloudiness}%',
+                                                        style: TextStyle(
+                                                          fontSize: 9,
+                                                          fontWeight:
+                                                              FontWeight.w200,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
+                                                ],
                                               ),
                                         ],
                                       ),
