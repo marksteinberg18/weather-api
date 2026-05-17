@@ -78,9 +78,11 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
       setState(() => _status = 'Fetching weather data');
 
       //Build the URL
+      //Testing: Luxor 25.6872° N, 32.6396° E
       final url = Uri.parse(
         '$apiUrl?lat=${position.latitude}&long=${position.longitude}',
       ); //not used for testing
+      //final url = Uri.parse('$apiUrl?lat25.6872=&long=32.6396'); //Luxor
 
       final response = await http.get(url);
       //final response = await http.get(
@@ -359,9 +361,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                               ),
                                               children: [
                                                 TextSpan(
-                                                  text:
-                                                      _weatherData!
-                                                          .weatherDescription,
+                                                  text: 'weather description',
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w900,
