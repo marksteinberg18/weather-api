@@ -13,6 +13,9 @@ void main() {
 
 const _white = Colors.white;
 const _offWhite = Color(0xFFF5F5F5);
+const _cream = Color(0xFFF0C5);
+const _ivory = Color(0xFFFFF0);
+const _lightBeige = Color(0xF5F5DC);
 
 class UVWeatherApp extends StatelessWidget {
   const UVWeatherApp({super.key});
@@ -376,7 +379,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                                         size: 20,
                                                         color: _offWhite,
                                                       ),
-                                                      SizedBox(width: 4),
+                                                      SizedBox(width: 6),
                                                     ],
                                                   ),
                                               _weatherData == null
@@ -407,7 +410,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                                     children: [
                                                       Icon(
                                                         WeatherIcons.rain_mix,
-                                                        size: 9,
+                                                        size: 12,
                                                         color: Colors.black,
                                                       ),
                                                       Text(
@@ -421,7 +424,7 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                                                       ),
                                                       Icon(
                                                         WeatherIcons.cloudy,
-                                                        size: 9,
+                                                        size: 12,
                                                         color: Colors.black,
                                                       ),
                                                       Text(
@@ -448,7 +451,31 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                         ),
                       ),
                     ),
-                    Text('hello'),
+                    SizedBox(width: double.infinity),
+                    Card(
+                      child: (Row(
+                        children: [
+                          Column(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Center(child: Text('SUNRISE')),
+                              ),
+                            ],
+                          ),
+                          VerticalDivider(),
+                          Expanded(
+                            flex: 1,
+                            child: Center(child: Text('SUNSET')),
+                          ),
+                          VerticalDivider(),
+                          Expanded(
+                            flex: 1,
+                            child: Center(child: Text('UV INDEX')),
+                          ),
+                        ],
+                      )),
+                    ),
                   ],
                 ),
               ),
