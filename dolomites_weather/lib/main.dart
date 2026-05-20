@@ -451,30 +451,53 @@ class _WeatherScreenState extends State<MainWeatherScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(width: double.infinity),
-                    Card(
-                      child: (Row(
-                        children: [
-                          Column(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Center(child: Text('SUNRISE')),
+                    SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(
+                              0xFFFFF3E0,
+                            ).withValues(alpha: 0.9), // Warm peach (left)
+                            Color(
+                              0xFFE8D5F0,
+                            ).withValues(alpha: 0.9), // Soft purple (right)
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                          //color: Colors.white.withValues(alpha: 0.15),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 8,
+                            ),
+                            child: IntrinsicHeight(
+                              child: Row(
+                                children: [
+                                  Expanded(child: Center(child: Text("1"))),
+                                  VerticalDivider(
+                                    color: Colors.white30,
+                                    thickness: 1,
+                                  ),
+                                  Expanded(child: Center(child: Text("2"))),
+                                  VerticalDivider(
+                                    color: Colors.white30,
+                                    thickness: 1,
+                                  ),
+                                  Expanded(child: Center(child: Text("3"))),
+                                  VerticalDivider(
+                                    color: Colors.white30,
+                                    thickness: 1,
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                          VerticalDivider(),
-                          Expanded(
-                            flex: 1,
-                            child: Center(child: Text('SUNSET')),
-                          ),
-                          VerticalDivider(),
-                          Expanded(
-                            flex: 1,
-                            child: Center(child: Text('UV INDEX')),
-                          ),
-                        ],
-                      )),
+                        ),
+                      ),
                     ),
                   ],
                 ),

@@ -86,6 +86,9 @@ class WeatherData {
     final int dateUnix = (json['date']);
     final String location = json['place_name'];
     final int weatherIcon = json['weather_icon'];
+    final String sunrise = json['sunrise_local'];
+    final String sunset = json['sunset_local'];
+    final String uvMaxTime = json['maxuv_time_local'];
 
     return WeatherData(
       placeName: location.toLowerCase(),
@@ -97,9 +100,9 @@ class WeatherData {
       datemonth: datemonthFinder(dateUnix),
       maxUV: maximumUV,
       maxTemp: maxTemp,
-      maxuvTimeLocal: json['maxuv_time_local'],
-      sunriseLocal: json['sunrise_local'],
-      sunsetLocal: json['sunset_local'],
+      maxuvTimeLocal: formatLocalTime(uvMaxTime),
+      sunriseLocal: formatLocalTime(sunrise),
+      sunsetLocal: formatLocalTime(sunset),
       weatherIcon: assignWeatherIcon(weatherIcon),
       burnTimes: Map<String, int>.from(json['burn_times']),
       elevation: json['elevation'],
@@ -176,6 +179,15 @@ IconData assignWeatherIcon(int weatherCode) {
   // 85, 86	Snow showers slight and heavy
   // 95 *	Thunderstorm: Slight or moderate
   // 96, 99 *	Thunderstorm with slight and heavy hail
+}
+
+String formatLocalTime(String timeStr) {
+  final parts = timeStr.split(':');
+  final hour = int.parse(parts[0]);
+  final minute = parts[1];
+  final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+  final period = hour >= 12 ? 'PM' : 'AM';
+  return '$displayHour:$minute $period';
 }
 
 String dayFinder(int dateUnix) {
